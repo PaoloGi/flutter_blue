@@ -28,14 +28,11 @@ public class MidiBridge
     public static int FLUIDSYNTH = 2;
 
     private Context context;
-    private Object engine;
 
     //SonyVox
-    private MidiDriver sonivox;
+    private DriverBase engine;
     //Kyo SherlockMidi
    // private SoftSynthesizer kyoSynth;
-
-
 
     public MidiBridge(Context context){
         this.context = context;
@@ -46,11 +43,14 @@ public class MidiBridge
             setSonivoxEngine((MidiDriver.OnMidiStartListener)listener);
         } else if (getEngineIdx() == MidiBridge.KYO){
             setKyoEngine();
+        } else if (getEngineIdx() == MidiBridge.FLUIDSYNTH){
+            setFluidSynthEngine();
         }
     }
 
     public int getEngineIdx(){
-        return 0;
+        //return 0; //sonivox
+        return 2; //fluidsynth
         /*
         SharedPreferences preferences = context.getSharedPreferences(
                 SettingsFragment.PREFERENCES_FILE,
@@ -61,15 +61,24 @@ public class MidiBridge
 
     }
 
-    public Object getEngine() {
+    public DriverBase getEngine() {
         return engine;
     }
 
     public void setSonivoxEngine(MidiDriver.OnMidiStartListener midiStartListener){
-        sonivox = new MidiDriver();
-        sonivox.setOnMidiStartListener(midiStartListener);
-        engine = sonivox;
+        engine = new MidiDriver();
+        ((MidiDriver)engine).setOnMidiStartListener(midiStartListener);
 
+    }
+
+    public void setFluidSynthEngine() {
+        String path = context.getApplicationContext().getDir("flutter", Context.MODE_PRIVATE).getPath();
+        String sfPath = path + "/soundfont_recorder.sf2";
+        Log.i("MidiBridge","setFluidSynthEngine sfPath=" + sfPath);
+
+        engine = new FluidSynthDriver();
+        engine.init();
+        ((FluidSynthDriver)engine).setSF2(sfPath);
     }
 
     public void setKyoEngine(){
@@ -101,9 +110,13 @@ public class MidiBridge
 
     public void write(byte msg[]){
         //Log.w("MidiBridge", "writing message to Synth engine... "+ CommonResources.bytesToHex(msg));
-        if (engine == sonivox){
-            sonivox.write(msg);
+        if(engine == null){
+            Log.e("MidiBridge", "write: Engine not SET :( aborting..");
+            return;
         }
+
+        engine.write(msg);
+
         /*
         else if( engine == kyoSynth){
             try {
@@ -121,61 +134,31 @@ public class MidiBridge
             }
         }
          */
-
-        else {
-            Log.e("MidiBridge", "write: Engine not YET implemented");
-        }
-        //Log.w("MidiBridge", "wrote message to Synth engine... " + CommonResources.bytesToHex(msg));
-
     }
 
     public int[] config(){
-        if (engine == sonivox){
-            return sonivox.config();
+        if(engine == null){
+            Log.e("MidiBridge", "write: Engine not SET :( aborting..");
+            return null;
         }
-        /*else if( engine == kyoSynth){
-            Log.w("MidiBridge", "config: nothing to do");
-        }
-        */
-        else {
-            Log.e("MidiBridge", "config: Engine not YET implemented");
-        }
-
-
-        return null;
+        return engine.config();
     }
 
     public void stop(){
-        if (engine == sonivox){
-            sonivox.stop();
+        if(engine == null){
+            Log.e("MidiBridge", "write: Engine not SET :( aborting..");
+            return;
         }
-        /*
-        else if( engine == kyoSynth){
-            Log.w("MidiBridge", "stop: nothing to do");
-        }
-        */
-
-        else {
-            Log.e("MidiBridge", "stop: Engine not YET implemented");
-        }
+        engine.stop();
+        return;
     }
 
     public void start(){
-        if (engine == sonivox){
-            sonivox.start();
+        if(engine == null){
+            Log.e("MidiBridge", "write: Engine not SET :( aborting..");
+            return;
         }
-        /*
-        else if( engine == kyoSynth){
-            Log.w("MidiBridge", "start: nothing to do");
-        }
-        */
-
-        else {
-            Log.e("MidiBridge", "stop: Engine not YET implemented");
-        }
+        engine.start();
+        return;
     }
-
-
-
-
 }

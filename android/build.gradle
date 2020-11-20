@@ -60,9 +60,9 @@ android {
         }
     }
     externalNativeBuild {
-        ndkBuild {
-            path 'src/main/jni/Android.mk'
-        }
+//        ndkBuild { path 'src/main/jni/Android.mk' }
+        cmake { path "src/main/cpp/CMakeLists.txt" }
+
     }
     defaultConfig {
         minSdkVersion 18
@@ -101,3 +101,14 @@ dependencies {
     api 'androidx.core:core:1.0.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
 }
+
+task runNdkBuild(type: Exec) {
+    println 'runNdkBuild!'
+    def ndkDir = android.ndkDirectory
+    executable = "$ndkDir/ndk-build"
+    args = ['NDK_PROJECT_PATH=build/intermediates/ndk',
+            'NDK_LIBS_OUT=src/main/jniLibs',
+            'APP_BUILD_SCRIPT=src/main/jni/Android.mk',
+            'NDK_APPLICATION_MK=src/main/jni/Application.mk']
+}
+preBuild.dependsOn runNdkBuild

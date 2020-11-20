@@ -21,11 +21,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 package org.billthefarmer.mididriver;
-
+import android.util.Log;
 /**
  * MidiDriver class
  */
-public class MidiDriver
+public class MidiDriver extends DriverBase
 {
     /**
      * Midi start listener
@@ -96,7 +96,7 @@ public class MidiDriver
      *
      * @return true for success
      */
-    private native boolean init();
+    public native boolean init();
 
     /**
      * Returm part of EAS config
@@ -133,6 +133,7 @@ public class MidiDriver
     // Load midi library
     static
     {
-        System.loadLibrary("midi");
+        Log.i("MidiDriver","loading midi");
+        System.loadLibrary("midi"); //mididriver
     }
 }
