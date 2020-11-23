@@ -6,6 +6,10 @@ cmake_minimum_required(VERSION 3.4.1)
 
 # Create a variable fluidsynth_DIR to specify where the fluidsynth library is located.
 set(fluidsynth_DIR ${CMAKE_CURRENT_SOURCE_DIR}/fluidsynth)
+set (OBOE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../oboe)
+
+add_subdirectory (${OBOE_DIR} ./oboe)
+include_directories (${OBOE_DIR}/include)
 
 # Our code (native-lib.cpp) will be calling fluidsynth functions, so we add the fluidsynth binaries as dependencies of our code.
 
@@ -105,4 +109,5 @@ target_link_libraries(
         libz
         preloadable_libiconv
         ${log-lib}
+        oboe
 )

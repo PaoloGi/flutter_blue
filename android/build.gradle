@@ -48,6 +48,11 @@ android {
     defaultConfig {
         minSdkVersion 19
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        externalNativeBuild {
+            cmake {
+                arguments "-DANDROID_STL=c++_shared"
+            }
+        }
     }
     lintOptions {
         disable 'InvalidPackage'
@@ -61,7 +66,9 @@ android {
     }
     externalNativeBuild {
 //        ndkBuild { path 'src/main/jni/Android.mk' }
-        cmake { path "src/main/cpp/CMakeLists.txt" }
+        cmake {
+            path "src/main/cpp/CMakeLists.txt"
+        }
 
     }
     defaultConfig {
@@ -72,6 +79,8 @@ android {
             abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
         }
     }
+
+
 }
 
 protobuf {
@@ -100,6 +109,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.0.0'
     api 'androidx.core:core:1.0.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+    implementation 'com.google.oboe:oboe:1.4.3'
 }
 
 task runNdkBuild(type: Exec) {

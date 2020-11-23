@@ -30,5 +30,6 @@ public class FluidSynthDriver extends DriverBase
     public native boolean write(byte a[]);
     public native boolean setSF2(String path);
 
+    public native void setDefaultStreamValues(int defaultSampleRate, int defaultFramesPerBurst);
 
 }

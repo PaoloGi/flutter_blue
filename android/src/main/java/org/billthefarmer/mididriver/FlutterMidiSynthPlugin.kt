@@ -170,7 +170,7 @@ public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler, MidiDrive
   }
 
   public fun sendNoteOnWithMAC(ch: Int, n: Int, v: Int, mac: String) {
-    println ("sendNoteOnWithMAC $ch $n $v $mac recorders= $recorders")
+    //println ("sendNoteOnWithMAC $ch $n $v $mac recorders= $recorders")
     var idx = 0
     try {
       if(mac != null) {
@@ -181,7 +181,7 @@ public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler, MidiDrive
   }
 
   public fun sendNoteOffWithMAC(ch: Int, n: Int, v: Int, mac: String) {
-    println ("sendNoteOffWithMAC $ch $n $v $mac recorders= $recorders")
+    //println ("sendNoteOffWithMAC $ch $n $v $mac recorders= $recorders")
 
     var idx = 0
     try {
@@ -193,7 +193,7 @@ public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler, MidiDrive
   }
 
   public fun sendNoteOn(ch: Int, n: Int, v: Int) {
-    println (" -> noteON ch $ch n $n v $v")
+    //println (" -> noteON ch $ch n $n v $v")
     val msg = ByteArray(3)
     msg[0] = (0x90 or ch).toByte()
     msg[1] = n.toByte()
@@ -242,7 +242,7 @@ public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler, MidiDrive
   }
 
   public fun sendMidiWithMAC(m: Int, n: Int, v: Int, mac: String?) {
-    println("sendMidiWithMAC $m $n $v $mac recorders= $recorders")
+    //println("sendMidiWithMAC $m $n $v $mac recorders= $recorders")
 
     var idx = 0
     try {

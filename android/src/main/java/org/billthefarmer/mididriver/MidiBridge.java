@@ -3,6 +3,10 @@ package org.billthefarmer.mididriver;
 import android.content.Context;
 import android.util.Log;
 
+import android.media.AudioManager;
+import android.os.Build;
+import android.os.Bundle;
+import android.content.pm.PackageManager;
 
 //sherlockmidi
 /*
@@ -39,6 +43,9 @@ public class MidiBridge
     }
 
     public void init(Object listener){
+
+
+
         if (getEngineIdx() == MidiBridge.SONIVOX) {
             setSonivoxEngine((MidiDriver.OnMidiStartListener)listener);
         } else if (getEngineIdx() == MidiBridge.KYO){
@@ -77,6 +84,25 @@ public class MidiBridge
         Log.i("MidiBridge","setFluidSynthEngine sfPath=" + sfPath);
 
         engine = new FluidSynthDriver();
+
+
+        boolean hasLowLatencyFeature = context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_AUDIO_LOW_LATENCY);
+        boolean hasProFeature = context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_AUDIO_PRO);
+        Log.i("MidiBridge","hasLowLatencyFeature=" + hasLowLatencyFeature + " hasProFeature=" + hasProFeature);
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1){
+            AudioManager myAudioMgr = (AudioManager) context.getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+            String sampleRateStr = myAudioMgr.getProperty(AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE);
+            int defaultSampleRate = Integer.parseInt(sampleRateStr);
+            String framesPerBurstStr = myAudioMgr.getProperty(AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER);
+            int defaultFramesPerBurst = Integer.parseInt(framesPerBurstStr);
+            Log.i("MidiBridge","setting default stream values: sampleRate=" + defaultSampleRate + " framesPerBurst=" + defaultFramesPerBurst);
+
+            ((FluidSynthDriver)engine).setDefaultStreamValues(defaultSampleRate, defaultFramesPerBurst);
+        }
+
+
         engine.init();
         ((FluidSynthDriver)engine).setSF2(sfPath);
     }
