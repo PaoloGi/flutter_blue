@@ -34,16 +34,16 @@ extern "C" JNIEXPORT bool JNICALL Java_org_billthefarmer_mididriver_FluidSynthDr
     if( settings == NULL){
         settings = new_fluid_settings();
 
-        res = fluid_settings_setint(settings, "audio.period-size", framesPerBurst); //192
+        res = fluid_settings_setint(settings, "audio.period-size", 64); //192
         __android_log_print(ANDROID_LOG_INFO, TAG, "set  audio.period-size res=%d",res);
 
-//        res = fluid_settings_setint(settings, "audio.periods", 4);
-//        __android_log_print(ANDROID_LOG_INFO, TAG, "set  audio.periods res=%d",res);
+        res = fluid_settings_setint(settings, "audio.periods", 2);
+        __android_log_print(ANDROID_LOG_INFO, TAG, "set  audio.periods res=%d",res);
 
 //        res = fluid_settings_setint(settings, "audio.realtime-prio", 99);
 //        __android_log_print(ANDROID_LOG_INFO, TAG, "set  realtime-prio res=%d",res);
 
-        res = fluid_settings_setint(settings, "synth.polyphony", 64);
+        res = fluid_settings_setint(settings, "synth.polyphony", 8);
         __android_log_print(ANDROID_LOG_INFO, TAG, "set synth.polyphony res=%d",res);
 
         res = fluid_settings_setnum(settings, "synth.sample-rate", (double)sampleRate);
