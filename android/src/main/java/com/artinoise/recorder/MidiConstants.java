@@ -20,7 +20,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-package org.billthefarmer.mididriver;
+package com.artinoise.recorder;
 
 /**
  * Midi event type constants

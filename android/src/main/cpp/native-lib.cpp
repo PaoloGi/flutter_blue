@@ -25,7 +25,7 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved)
 }
 
 
-extern "C" JNIEXPORT bool JNICALL Java_org_billthefarmer_mididriver_FluidSynthDriver_init(JNIEnv* env, jobject) {
+extern "C" JNIEXPORT bool JNICALL Java_com_artinoise_recorder_FluidSynthDriver_init(JNIEnv* env, jobject) {
     int res;
     __android_log_print(ANDROID_LOG_INFO, TAG, "fluid_synth init");
 
@@ -87,7 +87,7 @@ extern "C" JNIEXPORT bool JNICALL Java_org_billthefarmer_mididriver_FluidSynthDr
     return true;
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_org_billthefarmer_mididriver_FluidSynthDriver_setSF2(JNIEnv* env, jobject, jstring jSoundfontPath) {
+extern "C" JNIEXPORT jboolean JNICALL Java_com_artinoise_recorder_FluidSynthDriver_setSF2(JNIEnv* env, jobject, jstring jSoundfontPath) {
     const char* soundfontPath = env->GetStringUTFChars(jSoundfontPath, nullptr);
     env->ReleaseStringUTFChars(jSoundfontPath, soundfontPath);
     // Load sample soundfont
@@ -96,7 +96,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_org_billthefarmer_mididriver_FluidSyn
     return true;
 }
 
-extern "C" JNIEXPORT bool JNICALL Java_org_billthefarmer_mididriver_FluidSynthDriver_write(JNIEnv* env, jobject, jbyteArray array) {
+extern "C" JNIEXPORT bool JNICALL Java_com_artinoise_recorder_FluidSynthDriver_write(JNIEnv* env, jobject, jbyteArray array) {
     static const unsigned char MIDI_CMD_NOTE_OFF = 0x80;
     static const unsigned char MIDI_CMD_NOTE_ON = 0x90;
     static const unsigned char MIDI_CMD_NOTE_PRESSURE = 0xa0; //polyphonic key pressure
@@ -143,7 +143,7 @@ extern "C" JNIEXPORT bool JNICALL Java_org_billthefarmer_mididriver_FluidSynthDr
 }
 
 
-extern "C" JNIEXPORT void JNICALL Java_org_billthefarmer_mididriver_FluidSynthDriver_shutdown(JNIEnv* env, jobject) {
+extern "C" JNIEXPORT void JNICALL Java_com_artinoise_recorder_FluidSynthDriver_shutdown(JNIEnv* env, jobject) {
     __android_log_print(ANDROID_LOG_INFO, TAG, "FluidSynthDriver shutdown");
     // Clean up
     delete_fluid_audio_driver(adriver);
@@ -151,7 +151,7 @@ extern "C" JNIEXPORT void JNICALL Java_org_billthefarmer_mididriver_FluidSynthDr
     delete_fluid_settings(settings);
 }
 
-extern "C" JNIEXPORT void JNICALL Java_org_billthefarmer_mididriver_FluidSynthDriver_setDefaultStreamValues(JNIEnv *env,
+extern "C" JNIEXPORT void JNICALL Java_com_artinoise_recorder_FluidSynthDriver_setDefaultStreamValues(JNIEnv *env,
       jclass type,
       jint _sampleRate,
       jint _framesPerBurst) {

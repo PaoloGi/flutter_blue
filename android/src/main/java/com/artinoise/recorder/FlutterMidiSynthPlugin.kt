@@ -1,5 +1,4 @@
-package org.billthefarmer.mididriver
-
+package com.artinoise.recorder
 
 import android.R
 import android.app.Activity
@@ -15,7 +14,6 @@ import io.flutter.plugin.common.PluginRegistry.Registrar
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import java.util.*
-
 
 /** FlutterMidiSynthPlugin */
 public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler,/* MidiDriver.OnMidiStartListener,*/ ActivityAware {

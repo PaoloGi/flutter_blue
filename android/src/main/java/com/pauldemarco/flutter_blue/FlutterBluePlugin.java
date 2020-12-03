@@ -45,7 +45,7 @@ import java.util.UUID;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import org.billthefarmer.mididriver.FlutterMidiSynthPlugin;
+import com.artinoise.recorder.FlutterMidiSynthPlugin;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;

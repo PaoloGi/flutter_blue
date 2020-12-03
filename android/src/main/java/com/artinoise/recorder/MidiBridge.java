@@ -1,4 +1,4 @@
-package org.billthefarmer.mididriver;
+package com.artinoise.recorder;
 
 import android.content.Context;
 import android.util.Log;
@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.content.pm.PackageManager;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
-import android.content.Context;
 
 //sherlockmidi
 /*

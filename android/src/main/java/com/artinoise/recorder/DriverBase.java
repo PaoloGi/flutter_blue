@@ -1,4 +1,4 @@
-package org.billthefarmer.mididriver;
+package com.artinoise.recorder;
 
 public class DriverBase {
     public DriverBase()
