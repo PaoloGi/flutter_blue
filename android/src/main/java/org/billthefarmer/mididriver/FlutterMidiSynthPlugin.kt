@@ -67,6 +67,7 @@ public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler,/* MidiDri
   public fun manageMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
     when (call.method){
       "initSynth" -> {
+        println("initSynth called")
         // Create midi driver
         midiBridge = MidiBridge(context)
         // Set on midi start listener

@@ -644,7 +644,7 @@ public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCa
             case "midiEvent":
             case "setReverb":
             case "setDelay":
-                log(LogLevel.INFO, "[handleCall] bridging call to FlutterMidiSynthPlugin");
+                log(LogLevel.INFO, "[handleCall] " + call.method + " bridging call to FlutterMidiSynthPlugin");
                 midiSynthPlugin.manageMethodCall(call,result);
                 break;
             ///FINE FlutterMidiSynthPlugin
