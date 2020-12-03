@@ -3,7 +3,6 @@
 #include <fluidsynth.h>
 #include <unistd.h>
 #include <android/log.h>
-#include <oboe/Oboe.h>
 
 #define TAG "recorder"
 
@@ -15,7 +14,7 @@
 static fluid_settings_t *settings = NULL;
 static fluid_synth_t * synth = NULL;
 static fluid_audio_driver_t * adriver = NULL;
-static int32_t sampleRate = 44100;
+static double sampleRate = 44100.0f;
 static int32_t framesPerBurst = 192;
 
 jint JNI_OnLoad(JavaVM* vm, void* reserved)
@@ -55,18 +54,20 @@ extern "C" JNIEXPORT bool JNICALL Java_org_billthefarmer_mididriver_FluidSynthDr
         res = fluid_settings_setint(settings, "synth.chorus.active", 0);
         __android_log_print(ANDROID_LOG_INFO, TAG, "set synth.chorus.active res=%d",res);
 
-//        char buf[256];
-//        res = fluid_settings_copystr(settings, "audio.driver", buf, sizeof(buf));
-//        __android_log_print(ANDROID_LOG_INFO, TAG, "current audio.driver res=%d val=%s",res,buf);
+        char buf[256];
+        res = fluid_settings_copystr(settings, "audio.driver", buf, sizeof(buf));
+        __android_log_print(ANDROID_LOG_INFO, TAG, "current audio.driver res=%d val=%s",res,buf);
 
- //       res = fluid_settings_setstr (settings, "audio.driver", "oboe");
- //       __android_log_print(ANDROID_LOG_INFO, TAG, "set audio.driver res=%d",res);
+        res = fluid_settings_setstr (settings, "audio.driver", "oboe");
+        __android_log_print(ANDROID_LOG_INFO, TAG, "set audio.driver res=%d",res);
+        res = fluid_settings_setint(settings, "audio.opensles.use-callback-mode", 1);
+        __android_log_print(ANDROID_LOG_INFO, TAG, "set audio.opensles.use-callback-mode res=%d",res);
 
-//        res = fluid_settings_copystr(settings, "audio.driver", buf, sizeof(buf));
-//        __android_log_print(ANDROID_LOG_INFO, TAG, "new audio.driver res=%d val=%s",res,buf);
+        res = fluid_settings_copystr(settings, "audio.driver", buf, sizeof(buf));
+        __android_log_print(ANDROID_LOG_INFO, TAG, "new audio.driver res=%d val=%s",res,buf);
 
-//        res = fluid_settings_setstr (settings, "audio.oboe.sharing-mode", "Exclusive");
-//        __android_log_print(ANDROID_LOG_INFO, TAG, "set audio.oboe.sharing-mode res=%d",res);
+        res = fluid_settings_setstr (settings, "audio.oboe.sharing-mode", "Exclusive");
+        __android_log_print(ANDROID_LOG_INFO, TAG, "set audio.oboe.sharing-mode res=%d",res);
 
         res = fluid_settings_setstr (settings, "audio.oboe.performance-mode", "LowLatency");
         __android_log_print(ANDROID_LOG_INFO, TAG, "set audio.oboe.performance-mode res=%d",res);
@@ -152,10 +153,10 @@ extern "C" JNIEXPORT void JNICALL Java_org_billthefarmer_mididriver_FluidSynthDr
 
 extern "C" JNIEXPORT void JNICALL Java_org_billthefarmer_mididriver_FluidSynthDriver_setDefaultStreamValues(JNIEnv *env,
       jclass type,
-      jint sampleRate,
-      jint framesPerBurst) {
+      jint _sampleRate,
+      jint _framesPerBurst) {
     //oboe::DefaultStreamValues::SampleRate =
-    sampleRate = (int32_t) sampleRate;
+    sampleRate = (double) _sampleRate;
     //oboe::DefaultStreamValues::FramesPerBurst =
-    framesPerBurst = (int32_t) framesPerBurst;
+    framesPerBurst = (int32_t) _framesPerBurst;
 }

@@ -1,6 +1,7 @@
 package org.billthefarmer.mididriver;
 import android.util.Log;
 
+
 public class FluidSynthDriver extends DriverBase
 {
     static
@@ -22,7 +23,9 @@ public class FluidSynthDriver extends DriverBase
 
     public void stop()
     {
+
         Log.i("FluidSynthDriver","stop() invoked");
+
     }
 
     public native boolean init();

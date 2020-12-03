@@ -7,6 +7,9 @@ import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.content.pm.PackageManager;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
+import android.content.Context;
 
 //sherlockmidi
 /*
@@ -32,6 +35,7 @@ public class MidiBridge
     public static int FLUIDSYNTH = 2;
 
     private Context context;
+    private WakeLock wakeLock;
 
     //SonyVox
     private DriverBase engine;
@@ -45,6 +49,9 @@ public class MidiBridge
     public void init(Object listener){
 
 
+        PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyWakelockTag");
+        wakeLock.acquire();
 
         if (getEngineIdx() == MidiBridge.SONIVOX) {
             setSonivoxEngine((MidiDriver.OnMidiStartListener)listener);
@@ -176,6 +183,8 @@ public class MidiBridge
             return;
         }
         engine.stop();
+        wakeLock.release();
+
         return;
     }
 

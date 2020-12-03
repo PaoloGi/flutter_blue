@@ -3,4 +3,20 @@
   <uses-permission android:name="android.permission.BLUETOOTH" />
   <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
   <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+  <uses-permission android:name="android.permission.WAKE_LOCK"/>
+<!--
+  <service
+      android:name="org.billthefarmer.mididriver.MidiSynthDeviceService"
+      android:permission="android.permission.BIND_MIDI_DEVICE_SERVICE">
+
+    <intent-filter>
+      <action
+          android:name="android.media.midi.MidiDeviceService" />
+    </intent-filter>
+
+    <meta-data
+        android:name="android.media.midi.MidiDeviceService"
+        android:resource="@ref/device_info" />
+  </service>
+-->
 </manifest>
