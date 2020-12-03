@@ -54,9 +54,11 @@ public class MidiBridge
         wakeLock.acquire();
 
         if (getEngineIdx() == MidiBridge.SONIVOX) {
-            setSonivoxEngine((MidiDriver.OnMidiStartListener)listener);
+            //setSonivoxEngine((MidiDriver.OnMidiStartListener)listener);
+            Log.w("MidiBridge","Sonivox engine removed.");
         } else if (getEngineIdx() == MidiBridge.KYO){
-            setKyoEngine();
+            //setKyoEngine();
+            Log.w("MidiBridge","Kyo engine removed.");
         } else if (getEngineIdx() == MidiBridge.FLUIDSYNTH){
             setFluidSynthEngine();
         }
@@ -79,11 +81,13 @@ public class MidiBridge
         return engine;
     }
 
+    /*
     public void setSonivoxEngine(MidiDriver.OnMidiStartListener midiStartListener){
         engine = new MidiDriver();
         ((MidiDriver)engine).setOnMidiStartListener(midiStartListener);
 
     }
+    */
 
     public void setFluidSynthEngine() {
         String path = context.getApplicationContext().getDir("flutter", Context.MODE_PRIVATE).getPath();

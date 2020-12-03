@@ -18,7 +18,7 @@ import java.util.*
 
 
 /** FlutterMidiSynthPlugin */
-public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler, MidiDriver.OnMidiStartListener , ActivityAware {
+public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler,/* MidiDriver.OnMidiStartListener,*/ ActivityAware {
   /// The MethodChannel that will the communication between Flutter and native Android
   ///
   /// This local reference serves to register the plugin with the Flutter Engine and unregister it
@@ -139,6 +139,7 @@ public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler, MidiDrive
     channel.setMethodCallHandler(null)
   }
 
+  /* Mididriver removed
   override fun onMidiStart() { // Program change - harpsichord
     selectInstrument(0, 0, 0, null)
 
@@ -153,7 +154,7 @@ public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler, MidiDrive
 
     println("$TAG:  $info")
   }
-
+  */
 
   public fun selectInstrument(ch: Int, i: Int, bank: Int, mac:String?) {
     //Select Sound Bank MSB
