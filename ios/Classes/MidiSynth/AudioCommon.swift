@@ -200,8 +200,9 @@ class AudioCommon
   //  call it in a background thread in the controller
   func loadSoundFont() {
     do {
+        let sfName = "soundfont_GM.sf2" //"soundfont_recorder.sf2"
         let documentDirectory = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor:nil, create:false)
-        var bankURL = documentDirectory.appendingPathComponent("soundfont_recorder.sf2")
+        var bankURL = documentDirectory.appendingPathComponent(sfName)
         checkError(osstatus: AudioUnitSetProperty(synthUnit!, AudioUnitPropertyID(kMusicDeviceProperty_SoundBankURL), AudioUnitScope(kAudioUnitScope_Global), 0, &bankURL, UInt32(MemoryLayout<URL>.size)))
     } catch {
         print ("error loading soundFont")
