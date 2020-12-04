@@ -9,7 +9,8 @@ import android.os.Bundle;
 import android.content.pm.PackageManager;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
-
+import android.content.SharedPreferences;
+import android.widget.Toast;
 //sherlockmidi
 /*
 import java.io.IOException;
@@ -100,17 +101,30 @@ public class MidiBridge
         boolean hasProFeature = context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_AUDIO_PRO);
         Log.i("MidiBridge","hasLowLatencyFeature=" + hasLowLatencyFeature + " hasProFeature=" + hasProFeature);
 
-
+        int defaultSampleRate = -1;
+        int defaultFramesPerBurst = -1;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1){
             AudioManager myAudioMgr = (AudioManager) context.getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
             String sampleRateStr = myAudioMgr.getProperty(AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE);
-            int defaultSampleRate = Integer.parseInt(sampleRateStr);
+            defaultSampleRate = Integer.parseInt(sampleRateStr);
             String framesPerBurstStr = myAudioMgr.getProperty(AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER);
-            int defaultFramesPerBurst = Integer.parseInt(framesPerBurstStr);
+            defaultFramesPerBurst = Integer.parseInt(framesPerBurstStr);
             Log.i("MidiBridge","setting default stream values: sampleRate=" + defaultSampleRate + " framesPerBurst=" + defaultFramesPerBurst);
 
             ((FluidSynthDriver)engine).setDefaultStreamValues(defaultSampleRate, defaultFramesPerBurst);
         }
+        SharedPreferences prefs = context.getSharedPreferences("FlutterSharedPreferences", Context.MODE_PRIVATE);
+        long selectedPerformance = prefs.getLong("flutter.selectedPerformance", 2); //high
+        long selectedPerformance2 = prefs.getLong("flutter.selectedPerformance2", 0);
+        int audioPeriods = selectedPerformance == 0 ? 16 //low
+                : selectedPerformance == 1 ? 8 //mid
+                : 2; //high
+        int audioPeriodSize = (int)(Math.pow(2,(selectedPerformance2))*64);
+        ;
+        Log.i("MidiBridge", "selectedPerformance=" + selectedPerformance + " -> audioPeriods=" + audioPeriods);
+        ((FluidSynthDriver)engine).setAudioPeriods(audioPeriods,audioPeriodSize);
+
+        Toast.makeText(context, "DeviceSampleRate=" + defaultSampleRate + " DeviceFramesPerBurst=" + defaultFramesPerBurst + " synthAudioPeriods=" + audioPeriods + " synthAudioPeriodSize=" + audioPeriodSize, Toast.LENGTH_LONG).show();
 
 
         engine.init();

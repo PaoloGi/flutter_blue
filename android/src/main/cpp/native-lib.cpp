@@ -16,7 +16,11 @@ static fluid_synth_t * synth = NULL;
 static fluid_audio_driver_t * adriver = NULL;
 static double sampleRate = 44100.0f;
 static int32_t framesPerBurst = 192;
-
+static int32_t audioPeriods = 2;
+static int32_t audioPeriodSize = 64;
+static bool alreadyInitialized = false;
+static char sfPath[1024];
+static int lastInstrumentIdx = 0;
 jint JNI_OnLoad(JavaVM* vm, void* reserved)
 {
     __android_log_print(ANDROID_LOG_INFO, TAG, "JNI_OnLoad");
@@ -29,15 +33,34 @@ extern "C" JNIEXPORT bool JNICALL Java_com_artinoise_recorder_FluidSynthDriver_i
     int res;
     __android_log_print(ANDROID_LOG_INFO, TAG, "fluid_synth init");
 
+    if(alreadyInitialized){
+            __android_log_print(ANDROID_LOG_INFO, TAG, "ALREADY INITIALIZED! re-initializing...");
+                delete_fluid_audio_driver(adriver);
+                delete_fluid_synth(synth);
+                delete_fluid_settings(settings);
+
+                adriver=NULL;
+                synth=NULL;
+                settings= NULL;
+
+    }
+
     // Setup synthesizer
     if( settings == NULL){
         settings = new_fluid_settings();
 
-        res = fluid_settings_setint(settings, "audio.period-size", 64); //192
+        res = fluid_settings_setint(settings, "audio.period-size", audioPeriodSize); //192 - framesPerBurst
         __android_log_print(ANDROID_LOG_INFO, TAG, "set  audio.period-size res=%d",res);
+        int val = -1;
+        res = fluid_settings_getint(settings, "audio.period-size", &val);
+        __android_log_print(ANDROID_LOG_INFO, TAG, "now  audio.period-size =%d",val);
 
-        res = fluid_settings_setint(settings, "audio.periods", 2);
+        __android_log_print(ANDROID_LOG_INFO, TAG, "setting  audio.period=%d",audioPeriods);
+        res = fluid_settings_setint(settings, "audio.periods", audioPeriods);
         __android_log_print(ANDROID_LOG_INFO, TAG, "set  audio.periods res=%d",res);
+        val = -1;
+        res = fluid_settings_getint(settings, "audio.periods", &val); //192
+        __android_log_print(ANDROID_LOG_INFO, TAG, "now  audio.periods =%d",val);
 
 //        res = fluid_settings_setint(settings, "audio.realtime-prio", 99);
 //        __android_log_print(ANDROID_LOG_INFO, TAG, "set  realtime-prio res=%d",res);
@@ -66,11 +89,14 @@ extern "C" JNIEXPORT bool JNICALL Java_com_artinoise_recorder_FluidSynthDriver_i
         res = fluid_settings_copystr(settings, "audio.driver", buf, sizeof(buf));
         __android_log_print(ANDROID_LOG_INFO, TAG, "new audio.driver res=%d val=%s",res,buf);
 
-        res = fluid_settings_setstr (settings, "audio.oboe.sharing-mode", "Exclusive");
-        __android_log_print(ANDROID_LOG_INFO, TAG, "set audio.oboe.sharing-mode res=%d",res);
+        //res = fluid_settings_setstr (settings, "audio.oboe.sharing-mode", "Exclusive");
+        //__android_log_print(ANDROID_LOG_INFO, TAG, "set audio.oboe.sharing-mode res=%d",res);
 
         res = fluid_settings_setstr (settings, "audio.oboe.performance-mode", "LowLatency");
         __android_log_print(ANDROID_LOG_INFO, TAG, "set audio.oboe.performance-mode res=%d",res);
+
+       res = fluid_settings_setnum (settings, "synth.gain", 1.0f);  //0.0 - 10.0 def: 0.2
+        __android_log_print(ANDROID_LOG_INFO, TAG, "set synth.gain res=%d",res);
 
     }
     if(synth == NULL) {
@@ -84,11 +110,19 @@ extern "C" JNIEXPORT bool JNICALL Java_com_artinoise_recorder_FluidSynthDriver_i
         adriver = new_fluid_audio_driver(settings, synth);
         LOGI("adriver=%p",adriver);
     }
+
+    if(alreadyInitialized){
+        int ret = fluid_synth_sfload(synth, sfPath, 1);
+        __android_log_print(ANDROID_LOG_INFO, TAG, "fluid_synth_sfload path=%s synth=%p adriver=%p ret=%d",sfPath, synth,adriver,ret);
+        fluid_synth_program_change(synth, 0, lastInstrumentIdx);
+    }
+    alreadyInitialized = true;
     return true;
 }
 
 extern "C" JNIEXPORT jboolean JNICALL Java_com_artinoise_recorder_FluidSynthDriver_setSF2(JNIEnv* env, jobject, jstring jSoundfontPath) {
     const char* soundfontPath = env->GetStringUTFChars(jSoundfontPath, nullptr);
+    snprintf(sfPath,sizeof(sfPath),"%s",soundfontPath);
     env->ReleaseStringUTFChars(jSoundfontPath, soundfontPath);
     // Load sample soundfont
     int ret = fluid_synth_sfload(synth, soundfontPath, 1);
@@ -130,6 +164,7 @@ extern "C" JNIEXPORT bool JNICALL Java_com_artinoise_recorder_FluidSynthDriver_w
             //__android_log_print(ANDROID_LOG_INFO, TAG, "FluidSynthDriver_sending Control Change Command!");
             fluid_synth_cc(synth, ch, d1, d2);break;
         case MIDI_CMD_PGM_CHANGE:
+            lastInstrumentIdx = d1;
             __android_log_print(ANDROID_LOG_INFO, TAG, "FluidSynthDriver_sending Program Change Command!");
             fluid_synth_program_change(synth, ch, d1);break;
         case MIDI_CMD_CHANNEL_PRESSURE:
@@ -155,8 +190,14 @@ extern "C" JNIEXPORT void JNICALL Java_com_artinoise_recorder_FluidSynthDriver_s
       jclass type,
       jint _sampleRate,
       jint _framesPerBurst) {
-    //oboe::DefaultStreamValues::SampleRate =
     sampleRate = (double) _sampleRate;
-    //oboe::DefaultStreamValues::FramesPerBurst =
     framesPerBurst = (int32_t) _framesPerBurst;
 }
+
+extern "C" JNIEXPORT void JNICALL Java_com_artinoise_recorder_FluidSynthDriver_setAudioPeriods(JNIEnv *env,
+      jclass type,
+      jint _audioPeriods,
+      jint _audioPeriodSize){
+          audioPeriods = (int32_t) _audioPeriods;
+          audioPeriodSize = (int32_t) _audioPeriodSize;
+      }

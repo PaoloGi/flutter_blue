@@ -27,7 +27,7 @@ public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler,/* MidiDri
   private lateinit var midiBridge: MidiBridge
   private var TAG: String = "FlutterMidiSynthPlugin"
 
-  private val recorders = HashMap<String, Int>() //mac,ch
+    private val recorders = HashMap<String, Int>() //mac,ch
 
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     attachToEngine(flutterPluginBinding)
@@ -173,7 +173,7 @@ public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler,/* MidiDri
     //println ("sendNoteOnWithMAC $ch $n $v $mac recorders= $recorders")
     var idx = 0
     try {
-      if(mac != null) {
+      if(mac != null && recorders.size>0) {
         idx = recorders[mac]!!
       }
     } catch (e: KotlinNullPointerException){}
@@ -185,7 +185,7 @@ public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler,/* MidiDri
 
     var idx = 0
     try {
-      if(mac != null) {
+      if(mac != null && recorders.size>0) {
         idx = recorders[mac]!!
       }
     } catch (e: KotlinNullPointerException){}
@@ -246,7 +246,7 @@ public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler,/* MidiDri
 
     var idx = 0
     try {
-      if(mac != null) {
+      if(mac != null && recorders.size>0) {
         idx = recorders[mac]!!
       }
     } catch (e: KotlinNullPointerException){}

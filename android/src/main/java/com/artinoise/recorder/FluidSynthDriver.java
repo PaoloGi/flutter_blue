@@ -34,5 +34,6 @@ public class FluidSynthDriver extends DriverBase
     public native boolean setSF2(String path);
 
     public native void setDefaultStreamValues(int defaultSampleRate, int defaultFramesPerBurst);
+    public native void setAudioPeriods(int audioPeriods, int audioPeriodSize);
 
 }
