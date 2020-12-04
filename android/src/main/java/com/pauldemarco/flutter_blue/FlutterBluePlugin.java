@@ -1022,18 +1022,21 @@ public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCa
                             case (byte) 0x80:
                                 midiSynthPlugin.sendNoteOffWithMAC(ch,d1,d2,gatt.getDevice().getAddress());
                                 break;
+                            /*
                             case (byte) 0xB0:
                                 if(d1==01) {
                                     break; //ignore Modulation Wheel
                                 }
                                 //ATTENZIONE NON C'E' IL BREAK!
-                            case (byte) 0xD0: /*aftertouch*/
+                            case (byte) 0xD0: //aftertouch
                                 status = (byte)0xB0;
                                 final int c = 60;
                                 double v = c + ((127.0f-c)*d1)/127.0f;
                                 d2=(byte)(int)v;
                                 d1=11;
                                 //break; ATTENZIONE NON C'E' IL BREAK!
+
+                             */
                             default:
                                 midiSynthPlugin.sendMidiWithMAC(ch|status,d1,d2,gatt.getDevice().getAddress());
                         }
