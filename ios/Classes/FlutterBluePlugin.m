@@ -591,7 +591,7 @@ typedef NS_ENUM(NSUInteger, LogLevel) {
             //NSLog(@"SNTX value:[status:%02x ch:%02x d1:%02x d2:%02x]", status, ch, d1, d2);
             
             if(status == 0x90 /*NoteON*/ || status == 0x80 /*NoteOFF*/ ||
-                (status >= 0xb0 /*CC*/ && status < 0xc0 /*PrgChg*/ && (ch != 52 && ch != 53) /*filtering accelerometer y an z*/ ) ||
+                (status >= 0xb0 /*CC*/ && status < 0xc0 /*PrgChg*/ && (d1 != 52 && d1 != 53) /*filtering accelerometer y an z*/ ) ||
                 (status >= 0xd0 /*ChPressure*/ && status < 0xe0 /*Bender*/)
                ){
                 //NSLog(@"SNTX forwarding MidiMessage to Synth! status=%02x uuid=%@",status ,peripheral.identifier);
@@ -603,7 +603,8 @@ typedef NS_ENUM(NSUInteger, LogLevel) {
                     [_midiSynth noteOffWithMacWithChannel:ch note:d1 velocity:d2 mac:[peripheral.identifier UUIDString]];
                     break;
                 default:
-                    if(status == 0xD0 /*aftertouch*/){
+                /*
+                    if(status == 0xD0){ //aftertouch
                       //print ("remapping aftertouch message ${msg.status} ${msg.d1} to Expression CC 0xB0 11 {msg.d1}" );
                       status = 0xB0;
                       int c = 60;
@@ -613,6 +614,7 @@ typedef NS_ENUM(NSUInteger, LogLevel) {
                       d2 = (int)v;
                       d1 = 11; //Expression CC
                     }
+                 */
                     [_midiSynth midiEventWithMacWithCommand:(ch | status) d1:d1 d2:d2 mac:[peripheral.identifier UUIDString]];
                     break;
                 }
