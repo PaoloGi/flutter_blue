@@ -119,8 +119,10 @@ public class MidiBridge
         int audioPeriods = selectedPerformance == 0 ? 16 //low
                 : selectedPerformance == 1 ? 8 //mid
                 : 2; //high
-        int audioPeriodSize = (int)(Math.pow(2,(selectedPerformance2))*64);
-        ;
+        int audioPeriodSize = selectedPerformance2 == 0 ? 0 : (int)(Math.pow(2,(selectedPerformance2))*64);
+        if (audioPeriodSize == 0 && defaultFramesPerBurst>0){
+            audioPeriodSize = defaultFramesPerBurst;
+        }
         Log.i("MidiBridge", "selectedPerformance=" + selectedPerformance + " -> audioPeriods=" + audioPeriods);
         ((FluidSynthDriver)engine).setAudioPeriods(audioPeriods,audioPeriodSize);
 
