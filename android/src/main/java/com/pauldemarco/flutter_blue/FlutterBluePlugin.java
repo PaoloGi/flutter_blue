@@ -1012,7 +1012,7 @@ public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCa
 
                     if (status == (byte)0x90 /*noteON*/ ||
                             status == (byte)0x80 /*noteOFF*/ ||
-                            (status >= (byte)0xb0 /*CC*/ && status < (byte)0xc0 /*PrgChg*/ && (ch != (byte)52 && ch != (byte)53) /*filtering accelerometer y and z*/) ||
+                            (status >= (byte)0xb0 /*CC*/ && status < (byte)0xc0 /*PrgChg*/ && (d1 != 52 && d1 != 53) /*filtering accelerometer y and z*/) ||
                             (status >= (byte)0xd0 /*ChPressure*/ && status < (byte)0xe0 /*bender*/)
                     ){
                         switch (status){
@@ -1022,7 +1022,12 @@ public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCa
                             case (byte) 0x80:
                                 midiSynthPlugin.sendNoteOffWithMAC(ch,d1,d2,gatt.getDevice().getAddress());
                                 break;
-                            /*
+                             /*
+                             case (byte) 0xB0:
+                                if(d1==11) {
+                                    break; //ignore Expression
+                                }
+
                             case (byte) 0xB0:
                                 if(d1==01) {
                                     break; //ignore Modulation Wheel
@@ -1037,6 +1042,7 @@ public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCa
                                 //break; ATTENZIONE NON C'E' IL BREAK!
 
                              */
+
                             default:
                                 midiSynthPlugin.sendMidiWithMAC(ch|status,d1,d2,gatt.getDevice().getAddress());
                         }

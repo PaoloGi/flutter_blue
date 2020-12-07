@@ -116,6 +116,7 @@ extern "C" JNIEXPORT bool JNICALL Java_com_artinoise_recorder_FluidSynthDriver_i
         __android_log_print(ANDROID_LOG_INFO, TAG, "fluid_synth_sfload path=%s synth=%p adriver=%p ret=%d",sfPath, synth,adriver,ret);
         fluid_synth_program_change(synth, 0, lastInstrumentIdx);
     }
+
     alreadyInitialized = true;
     return true;
 }
@@ -157,21 +158,21 @@ extern "C" JNIEXPORT bool JNICALL Java_com_artinoise_recorder_FluidSynthDriver_w
         case MIDI_CMD_NOTE_ON:
             //__android_log_print(ANDROID_LOG_INFO, TAG, "FluidSynthDriver_sending Note ON !");
             fluid_synth_noteon(synth, ch, d1, d2);break;
-        case MIDI_CMD_NOTE_PRESSURE:
-            __android_log_print(ANDROID_LOG_INFO, TAG, "FluidSynthDriver_sending Note PRESSURE !");
+            case MIDI_CMD_NOTE_PRESSURE:
+            __android_log_print(ANDROID_LOG_INFO, TAG, "FluidSynthDriver_sending Note PRESSURE ! %d %d %d", ch,d1,d2);
             fluid_synth_key_pressure(synth, ch, d1, d2);break;
         case MIDI_CMD_CONTROL:
-            //__android_log_print(ANDROID_LOG_INFO, TAG, "FluidSynthDriver_sending Control Change Command!");
+            //__android_log_print(ANDROID_LOG_INFO, TAG, "FluidSynthDriver_sending Control Change Command! %d %d %d", ch,d1,d2);
             fluid_synth_cc(synth, ch, d1, d2);break;
         case MIDI_CMD_PGM_CHANGE:
             lastInstrumentIdx = d1;
-            __android_log_print(ANDROID_LOG_INFO, TAG, "FluidSynthDriver_sending Program Change Command!");
+            __android_log_print(ANDROID_LOG_INFO, TAG, "FluidSynthDriver_sending Program Change Command! %d %d %d", ch,d1,d2);
             fluid_synth_program_change(synth, ch, d1);break;
         case MIDI_CMD_CHANNEL_PRESSURE:
-             __android_log_print(ANDROID_LOG_INFO, TAG, "FluidSynthDriver_sending Channel Pressure Command!");
+             __android_log_print(ANDROID_LOG_INFO, TAG, "FluidSynthDriver_sending Channel Pressure Command! %d %d", ch,d1);
            fluid_synth_channel_pressure(synth, ch, d1);break;
         case MIDI_CMD_BENDER:
-             __android_log_print(ANDROID_LOG_INFO, TAG, "FluidSynthDriver_sending Pitch Bend Command!");
+             __android_log_print(ANDROID_LOG_INFO, TAG, "FluidSynthDriver_sending Pitch Bend Command! %d %d %d", ch,d1,d2);
            fluid_synth_pitch_bend(synth, ch, d1);break;
     }
     return true;
