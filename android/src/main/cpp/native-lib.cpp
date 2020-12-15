@@ -98,6 +98,13 @@ extern "C" JNIEXPORT bool JNICALL Java_com_artinoise_recorder_FluidSynthDriver_i
        res = fluid_settings_setnum (settings, "synth.gain", 1.0f);  //0.0 - 10.0 def: 0.2
         __android_log_print(ANDROID_LOG_INFO, TAG, "set synth.gain res=%d",res);
 
+
+        //reverb
+       res = fluid_settings_setnum (settings, "synth.reverb.level", 1.0f);  //0.0 - 1.0 def: 0.9
+        __android_log_print(ANDROID_LOG_INFO, TAG, "set reverb.level res=%d",res);
+       res = fluid_settings_setnum (settings, "synth.reverb.room-size", 0.5f);  //0.0 - 1.0 def: 0.2
+        __android_log_print(ANDROID_LOG_INFO, TAG, "set reverb.room-size res=%d",res);
+
     }
     if(synth == NULL) {
         LOGI("instancing synth");
