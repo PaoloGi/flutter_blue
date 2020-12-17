@@ -31,4 +31,8 @@ class FlutterMidiSynthPlugin {
   static Future<void> setDelay(double amount) async {
     return _channel.invokeMethod('setDelay', amount );
   }
+
+  static Future<void> initAudioSession(int param) async {
+    return _channel.invokeMethod('initAudioSession', param);
+  }
 }

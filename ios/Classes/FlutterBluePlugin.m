@@ -281,7 +281,9 @@ typedef NS_ENUM(NSUInteger, LogLevel) {
     [@"noteOff" isEqualToString:call.method] ||
     [@"midiEvent" isEqualToString:call.method] ||
     [@"setReverb" isEqualToString:call.method] ||
-    [@"setDelay" isEqualToString:call.method]
+    [@"setDelay" isEqualToString:call.method] ||
+    [@"initAudioSession" isEqualToString:call.method] 
+
     ) {
       [_midiSynth handleMethodCall:call result:result];
     }

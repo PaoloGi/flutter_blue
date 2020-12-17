@@ -21,8 +21,8 @@ final class SoftSynth : AudioCommon {
 
     func playNoteOn(channel: Int, note: UInt8, midiVelocity: Int, sequencer: Sequencer) {
         let noteCommand = UInt32(0x90 | channel)
-        let base = note - 48
-        let octaveAdjust = (UInt8(octave) * 12) + base
+        let base:Int = Int(note) - 48
+        let octaveAdjust = (Int(UInt8(octave)) * 12) + base
         let pitch = UInt32(octaveAdjust)
         checkError(osstatus: MusicDeviceMIDIEvent(synthUnit!, noteCommand, pitch, UInt32(midiVelocity), 0))
         sequencer.noteOn(note: UInt8(pitch))
@@ -30,8 +30,8 @@ final class SoftSynth : AudioCommon {
   
     func playNoteOff(channel: Int, note: UInt8, midiVelocity: Int, sequencer: Sequencer) {
         let noteCommand = UInt32(0x80 | channel)
-        let base = note - 48
-        let octaveAdjust = (UInt8(octave) * 12) + base
+        let base:Int = Int(note) - 48
+        let octaveAdjust = (Int(UInt8(octave)) * 12) + base
         let pitch = UInt32(octaveAdjust)
         checkError(osstatus: MusicDeviceMIDIEvent(synthUnit!, noteCommand, pitch, UInt32(midiVelocity), 0))
         sequencer.noteOff(note: UInt8(pitch))
