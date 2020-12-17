@@ -27,7 +27,7 @@ public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler,/* MidiDri
   private lateinit var midiBridge: MidiBridge
   private var TAG: String = "FlutterMidiSynthPlugin"
 
-    private val recorders = HashMap<String, Int>() //mac,ch
+  private val recorders = HashMap<String, Int>() //mac,ch
 
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     attachToEngine(flutterPluginBinding)
@@ -122,7 +122,10 @@ public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler,/* MidiDri
         println("FlutterMidiSynthplugin: setDelay not yet implemented under Android.");
         result.success(null);
       }
-
+      "initAudioSession" -> {
+        println("FlutterMidiSynthplugin: initAudioSession not needed under Android.");
+        result.success(null);
+      }
       else -> {
         println("unknown method " + call.method);
         result.notImplemented();
@@ -157,15 +160,15 @@ public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler,/* MidiDri
 
   public fun selectInstrument(ch: Int, i: Int, bank: Int, mac:String?) {
     //Select Sound Bank MSB
-    if (mac != null) {
+    if (!mac.isNullOrEmpty()) {
       recorders[mac] = ch
       print ("recorders: $recorders")
     }
     val bankMSB = bank shr 7
     val bankLSB = bank and 0x7f
     println(" -> selectInstrument ch $ch i $i bank $bank (bankMSB $bankMSB bankLSB $bankLSB mac $mac\n")
-    sendMidi(0xB0, 0x0,  bankMSB)
-    sendMidi(0xB0, 0x20, bankLSB)
+    sendMidi(0xB0 + ch, 0x0,  bankMSB)
+    sendMidi(0xB0 + ch, 0x20, bankLSB)
     sendMidiProgramChange(ch, i)
   }
 
@@ -173,7 +176,7 @@ public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler,/* MidiDri
     //println ("sendNoteOnWithMAC $ch $n $v $mac recorders= $recorders")
     var idx = 0
     try {
-      if(mac != null && recorders.size>0) {
+      if(!mac.isNullOrEmpty() && recorders?.size>0) {
         idx = recorders[mac]!!
       }
     } catch (e: KotlinNullPointerException){}
@@ -185,7 +188,7 @@ public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler,/* MidiDri
 
     var idx = 0
     try {
-      if(mac != null && recorders.size>0) {
+      if(!mac.isNullOrEmpty() && recorders?.size>0) {
         idx = recorders[mac]!!
       }
     } catch (e: KotlinNullPointerException){}
@@ -246,7 +249,7 @@ public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler,/* MidiDri
 
     var idx = 0
     try {
-      if(mac != null && recorders.size>0) {
+      if(!mac.isNullOrEmpty() && recorders?.size>0) {
         idx = recorders[mac]!!
       }
     } catch (e: KotlinNullPointerException){}
