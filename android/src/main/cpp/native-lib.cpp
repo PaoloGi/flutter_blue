@@ -95,7 +95,7 @@ extern "C" JNIEXPORT bool JNICALL Java_com_artinoise_recorder_FluidSynthDriver_i
         res = fluid_settings_setstr (settings, "audio.oboe.performance-mode", "LowLatency");
         __android_log_print(ANDROID_LOG_INFO, TAG, "set audio.oboe.performance-mode res=%d",res);
 
-       res = fluid_settings_setnum (settings, "synth.gain", 1.0f);  //0.0 - 10.0 def: 0.2
+       res = fluid_settings_setnum (settings, "synth.gain", 2.0f);  //0.0 - 10.0 def: 0.2
         __android_log_print(ANDROID_LOG_INFO, TAG, "set synth.gain res=%d",res);
 
 
