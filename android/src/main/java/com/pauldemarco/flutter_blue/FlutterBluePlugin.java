@@ -46,6 +46,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.artinoise.recorder.FlutterMidiSynthPlugin;
+import com.artinoise.recorder.CircularFifoArray;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
@@ -92,6 +93,7 @@ public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCa
     private boolean allowDuplicates = false;
 
     private FlutterMidiSynthPlugin midiSynthPlugin = new FlutterMidiSynthPlugin();
+    java.util.HashMap<Integer, CircularFifoArray> xpressionsMap=new HashMap<Integer,CircularFifoArray>(); //ch,List<values>
 
     /** Plugin registration. */
     public static void registerWith(Registrar registrar) {
@@ -1021,14 +1023,19 @@ public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCa
                                 midiSynthPlugin.sendNoteOnWithMAC(ch,d1,d2,gatt.getDevice().getAddress());
                                 break;
                             case (byte) 0x80:
+                                CircularFifoArray xpressions = xpressionsMap.get((int) ch);
+                                if(xpressions != null) {
+                                    xpressions.clear();
+                                }
                                 midiSynthPlugin.sendNoteOffWithMAC(ch,d1,d2,gatt.getDevice().getAddress());
                                 break;
-                             /*
+
                              case (byte) 0xB0:
                                 if(d1==11) {
-                                    break; //ignore Expression
+                                    //break; //ignore Expression
+                                    d2 = xpressionAvg(ch,d2);
                                 }
-
+                            /*
                             case (byte) 0xB0:
                                 if(d1==01) {
                                     break; //ignore Modulation Wheel
@@ -1051,6 +1058,18 @@ public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCa
 
                 }
             }
+        }
+
+        private byte xpressionAvg(byte ch, byte v){
+            CircularFifoArray xpressions = xpressionsMap.get((int) ch);
+            Log.i("xpressionAvg", " ch=" + ch + " xpressions=" + xpressions );
+            if(xpressions == null){
+                xpressions = new CircularFifoArray(30);
+            }
+            xpressions.add((int) v);
+            xpressionsMap.put((int) ch,xpressions);
+
+            return (byte) (xpressions.avg() & 0xff);
         }
 
         @Override
