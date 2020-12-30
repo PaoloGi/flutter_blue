@@ -14,10 +14,12 @@ class AudioCommon
   var synthUnit:    AudioUnit?
   var reverbUnit:   AudioUnit?
   var delayUnit:    AudioUnit?
+    var mixerUnit: AudioUnit? //to set output Volume
   var patch = UInt32(0)
   
   var reverbNode = AUNode()
   var delayNode = AUNode()
+    var mixerNode = AUNode()
     
     func initAudioSession(){
         
@@ -64,13 +66,15 @@ class AudioCommon
     checkError(osstatus: NewAUGraph(&audioGraph))
     createReverbNode(audioGraph: audioGraph!, outputNode: &reverbNode) //SANTOX
     createDelayNode(audioGraph: audioGraph!, outputNode: &delayNode) //SANTOX
-    createOutputNode(audioGraph: audioGraph!, outputNode: &outputNode)
+    createMixerNode(audioGraph: audioGraph!, outputNode: &mixerNode) //SANTOX
+    createOutputNode(audioGraph: audioGraph!, outputNode: &outputNode) //SANTOX
     createSynthNode()
     checkError(osstatus: AUGraphOpen(audioGraph!))
     // get the synth unit
     checkError(osstatus: AUGraphNodeInfo(audioGraph!, synthNode, nil, &synthUnit))
     checkError(osstatus: AUGraphNodeInfo(audioGraph!, reverbNode, nil, &reverbUnit)) //SANTOX
     checkError(osstatus: AUGraphNodeInfo(audioGraph!, delayNode, nil, &delayUnit)) //SANTOX
+    checkError(osstatus: AUGraphNodeInfo(audioGraph!, mixerNode, nil, &mixerUnit)) //SANTOX
 
     let synthOutputElement: AudioUnitElement = 0
     let ioUnitInputElement: AudioUnitElement = 0
@@ -86,6 +90,9 @@ class AudioCommon
                               delayNode, ioUnitInputElement))
     checkError(osstatus:
       AUGraphConnectNodeInput(audioGraph!, delayNode, synthOutputElement,
+                              mixerNode, ioUnitInputElement))
+    checkError(osstatus:
+      AUGraphConnectNodeInput(audioGraph!, mixerNode, synthOutputElement,
                               outputNode, ioUnitInputElement))
 
     
@@ -95,6 +102,7 @@ class AudioCommon
     loadPatch(patchNo: 0)
     setReverb(dryWet:0.0)
     setDelay(dryWet:0.0)
+    setVolume(val:2.0)
   }
   
   // Mark: - Audio Init Utility Methods
@@ -107,6 +115,31 @@ class AudioCommon
     checkError(osstatus: AUGraphAddNode(audioGraph, &cd, outputNode))
   }
   
+    func setVolume(val: Float){
+        print("setVolume \(val)")
+
+        var busCount:UInt32   = 1    // bus count for mixer unit input
+        let status = AudioUnitSetProperty (mixerUnit!,
+                                       kAudioUnitProperty_ElementCount,
+                                       kAudioUnitScope_Input,
+                                       0,
+                                       &busCount,
+                                       UInt32(MemoryLayout<UInt32>.size)
+                                       )
+        
+        var res =
+        AudioUnitSetParameter(mixerUnit!, kAudioUnitScope_Global, 0, kMultiChannelMixerParam_Volume, Float(val), 0)
+        print("set global vol res=\(res)")
+        res = AudioUnitSetParameter(mixerUnit!, kMultiChannelMixerParam_Enable, kAudioUnitScope_Input, 0 /*bus number*/, 1 /*on*/, 0)
+        print("set input enable res=\(res)")
+        res = AudioUnitSetParameter(mixerUnit!, kMultiChannelMixerParam_Enable, kAudioUnitScope_Output, 0 /*bus number*/, 1 /*on*/, 0)
+        print("set output enable res=\(res)")
+        res = AudioUnitSetParameter(mixerUnit!, kMultiChannelMixerParam_Volume, kAudioUnitScope_Input, 0 /*bus number*/,Float(val) /*gain*/, 0)
+        print("set input vol res=\(res)")
+        res = AudioUnitSetParameter(mixerUnit!, kMultiChannelMixerParam_Volume, kAudioUnitScope_Output, 0 /*bus number*/,Float(val) /*gain*/, 0)
+        print("set output vol res=\(res)")
+
+    }
     
     func setReverb(dryWet: Float){
         print("setReverb \(dryWet)")
@@ -163,6 +196,15 @@ class AudioCommon
       var cd = AudioComponentDescription(
         componentType: OSType(kAudioUnitType_Effect),
         componentSubType: OSType(kAudioUnitSubType_Reverb2),
+        componentManufacturer: OSType(kAudioUnitManufacturer_Apple),
+        componentFlags: 0,componentFlagsMask: 0)
+      checkError(osstatus: AUGraphAddNode(audioGraph, &cd, outputNode))
+    }
+
+    func createMixerNode(audioGraph: AUGraph, outputNode: UnsafeMutablePointer<AUNode>) {
+      var cd = AudioComponentDescription(
+        componentType: OSType(kAudioUnitType_Mixer),
+        componentSubType: OSType(kAudioUnitSubType_MultiChannelMixer),
         componentManufacturer: OSType(kAudioUnitManufacturer_Apple),
         componentFlags: 0,componentFlagsMask: 0)
       checkError(osstatus: AUGraphAddNode(audioGraph, &cd, outputNode))
