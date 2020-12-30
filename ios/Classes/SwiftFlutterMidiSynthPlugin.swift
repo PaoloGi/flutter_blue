@@ -11,6 +11,7 @@ import Foundation
     var recorders = [String : Int]() //[mac : channel]
     typealias instrumentInfos = (channel : Int, instrument: Int , bank: Int , mac:String?)
     var instruments = [Int:instrumentInfos]() //[channel, instrumentInfos
+    var xpressionsMap = [Int:[UInt32]]() //channel, expressions
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "FlutterMidiSynthPlugin", binaryMessenger: registrar.messenger())
@@ -46,7 +47,8 @@ import Foundation
             let args = call.arguments as? Dictionary<String, Any>
             let command = args?["command"] as! UInt32
             let d1 = args?["d1"] as! UInt32
-            let d2 = args?["d2"] as! UInt32
+            var d2 = args?["d2"] as! UInt32
+            
             self.midiEvent(command: command, d1: d1, d2: d2)
             
         case "setReverb":
@@ -64,6 +66,25 @@ import Foundation
             print ("unknown method \(call.method)" )
         }
         
+    }
+    
+    private func xpressionAvg(ch: Int, value: UInt32) -> UInt32{
+        var s: String = "";
+        var avg: UInt32 = 0
+        var xpressions = xpressionsMap[ch]
+        if(xpressions == nil){
+            xpressions = []
+        }
+        xpressions?.append(value)
+        xpressionsMap[ch] = xpressions
+        for v in xpressions! {
+            avg += v
+            s += " \(v)"
+        }
+        let r = avg / UInt32(xpressionsMap[ch]!.count)
+        s += " => r \(r)"
+        //print (s)
+        return r
     }
     
     @available(iOS 10.0, *)
@@ -191,6 +212,8 @@ import Foundation
     
     public func noteOff(channel: Int, note: Int, velocity: Int){
         if (channel < 0 || note < 0 || velocity < 0){ return }
+        xpressionsMap[channel] = []
+
         let sequencer = getSequencer(channel: channel)
         synth!.playNoteOff(channel: channel, note: UInt8(note), midiVelocity: velocity, sequencer: sequencer)
         sequencer.noteOff(note: UInt8(note))
@@ -199,6 +222,11 @@ import Foundation
     }
     
     public func midiEvent(command: UInt32, d1: UInt32, d2: UInt32){
+        //Average on xpression
+        var _d2 = d2
+        if(d1 == 11){
+            _d2 = xpressionAvg(ch: Int(command & 0xf), value: d2)
+        }
         synth!.midiEvent(cmd: command, d1: d1, d2_: d2);
     }
     
