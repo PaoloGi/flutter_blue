@@ -67,7 +67,13 @@ import Foundation
         }
         
     }
-    
+
+    private func xpressionScale(min: Int, max: Int, value: UInt32) -> UInt32 {
+        let scaled: Double = Double(min) + Double((max-min)*Int(value))/127.0
+        print("xpressionScale min=\(min) max=\(max) v=\(value) scaled=\(scaled)" )
+        return UInt32(scaled);
+    }
+
     private func xpressionAvg(ch: Int, value: UInt32) -> UInt32{
         var s: String = "";
         var avg: UInt32 = 0
@@ -225,7 +231,8 @@ import Foundation
         //Average on xpression
         var _d2 = d2
         if(d1 == 11){
-            _d2 = xpressionAvg(ch: Int(command & 0xf), value: d2)
+            // _d2 = xpressionAvg(ch: Int(command & 0xf), value: d2)
+            _d2 = xpressionScale(min:20, max:100, value: d2)
         }
         synth!.midiEvent(cmd: command, d1: d1, d2_: d2);
     }
