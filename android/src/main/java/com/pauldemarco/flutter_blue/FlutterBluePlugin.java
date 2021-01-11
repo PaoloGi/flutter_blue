@@ -1034,7 +1034,7 @@ public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCa
                                 if(d1==11) {
                                     //break; //ignore Expression
                                     //d2 = xpressionAvg(ch,d2);
-                                    d2 = xpressionScale(20,100,d2);
+                                    d2 = xpressionScale(25,110,d2);
                                 }
                             /*
                             case (byte) 0xB0:

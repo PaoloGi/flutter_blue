@@ -9,6 +9,7 @@ import Foundation
     var synth: SoftSynth?
     var sequencers: [Int:Sequencer] = [:]
     var recorders = [String : Int]() //[mac : channel]
+    var expressions = [String : Bool]() //[mac : expression]
     typealias instrumentInfos = (channel : Int, instrument: Int , bank: Int , mac:String?)
     var instruments = [Int:instrumentInfos]() //[channel, instrumentInfos
     var xpressionsMap = [Int:[UInt32]]() //channel, expressions
@@ -30,7 +31,8 @@ import Foundation
             let channel = args?["channel"] as! Int
             let bank = args?["bank"] as! Int
             let mac = args?["mac"] as! String
-            self.setInstrument(instrument: instrument, channel: channel, bank: bank, mac: mac)
+            let expression = args?["expression"] as! Bool
+            self.setInstrument(instrument: instrument, channel: channel, bank: bank, mac: mac, expression: expression)
         case "noteOn":
             let args = call.arguments as? Dictionary<String, Any>
             let channel = args?["channel"] as? Int
@@ -82,6 +84,7 @@ import Foundation
             xpressions = []
         }
         xpressions?.append(value)
+        xpressions = xpressions?.suffix(5)
         xpressionsMap[ch] = xpressions
         for v in xpressions! {
             avg += v
@@ -89,7 +92,7 @@ import Foundation
         }
         let r = avg / UInt32(xpressionsMap[ch]!.count)
         s += " => r \(r)"
-        //print (s)
+        print (s)
         return r
     }
     
@@ -177,34 +180,50 @@ import Foundation
         return sequencers[channel]!
     }
     
-    private func setInstrument(instrument: Int, channel: Int = 0, bank: Int = 0, mac: String? = nil){
-        print ("setInstrument \(instrument) \(channel) \(bank) \(mac)")
+    private func setInstrument(instrument: Int, channel: Int = 0, bank: Int = 0, mac: String? = nil, expression: Bool? = false){
+        print ("setInstrument \(instrument) \(channel) \(bank) \(mac) \(expression)")
         
         if(mac != nil){
             recorders[mac!] = channel
+            expressions[mac!] = expression
         }
         
         let infos : instrumentInfos = ( channel: channel, instrument: instrument, bank: bank, mac: mac)
         instruments[channel] = infos
         synth!.loadPatch(patchNo: instrument, channel: channel, bank: bank)
         getSequencer(channel: channel).patch = UInt32(instrument)
+        
+        //if(mac != nil){
+        //    midiEventWithMac(command: UInt32(channel), d1: 11, d2: 10, mac: mac!) //invio un expression fittizio
+        //}
     }
     
     public func noteOnWithMac(channel: Int, note: Int, velocity: Int, mac: String ){
-        //print ("noteOnWithMac \(channel) \(note) \(velocity) \(mac)")
+        print ("noteOnWithMac \(channel) \(note) \(velocity) \(mac)")
+        var vel = velocity
         let idx = recorders[mac] ?? 0
-        noteOn(channel: channel+idx, note: note, velocity: velocity)
+        let expression = expressions[mac] ?? false
+        //if (!expression){
+        //    vel = Int(xpressionsMap[channel]?.last ?? UInt32(velocity))
+        //}
+        noteOn(channel: channel+idx, note: note, velocity: vel)
     }
     
-    
     public func noteOffWithMac(channel: Int, note: Int, velocity: Int, mac: String){
+        print ("noteOffWithMac \(channel) \(note) \(velocity) \(mac)")
         let idx = recorders[mac] ?? 0
         noteOff(channel: channel+idx, note: note, velocity: velocity)
     }
     
     public func midiEventWithMac(command: UInt32, d1: UInt32, d2: UInt32, mac: String){
+        var _d2 = d2
         let idx = recorders[mac] ?? 0
-        midiEvent(command: command+UInt32(idx), d1: d1, d2: d2)
+        let expression = expressions[mac] ?? false
+        if(d1==11 && !expression){
+            print ("expression disabled for this instrument.")
+            _d2 = 80
+        }
+        midiEvent(command: command+UInt32(idx), d1: d1, d2: _d2)
     }
     
     public func noteOn(channel: Int, note: Int, velocity: Int){
@@ -229,12 +248,14 @@ import Foundation
     
     public func midiEvent(command: UInt32, d1: UInt32, d2: UInt32){
         //Average on xpression
+        var _d1 = d1
         var _d2 = d2
         if(d1 == 11){
-            // _d2 = xpressionAvg(ch: Int(command & 0xf), value: d2)
-            _d2 = xpressionScale(min:20, max:100, value: d2)
+            //_d2 = xpressionAvg(ch: Int(command & 0xf), value: _d2)
+            _d2 = xpressionScale(min:25, max:110, value: _d2)
+            //_d1 = 7
         }
-        synth!.midiEvent(cmd: command, d1: d1, d2_: d2);
+        synth!.midiEvent(cmd: command, d1: _d1, d2: _d2);
     }
     
     public func setReverb(dryWet: Float){

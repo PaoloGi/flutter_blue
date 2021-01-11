@@ -37,12 +37,12 @@ final class SoftSynth : AudioCommon {
         sequencer.noteOff(note: UInt8(pitch))
     }
     
-    func midiEvent(cmd: UInt32, d1: UInt32, d2_: UInt32) {
-        var d2: UInt32 = 0
-        if(d2_>0){
-            d2=d2_
+    func midiEvent(cmd: UInt32, d1: UInt32, d2: UInt32) {
+        var _d2: UInt32 = 0
+        if(d2>0){
+            _d2=d2
         }
-        checkError(osstatus: MusicDeviceMIDIEvent(synthUnit!, cmd, d1, d2, 0))
+        checkError(osstatus: MusicDeviceMIDIEvent(synthUnit!, cmd, d1, _d2, 0))
     }
 }
 

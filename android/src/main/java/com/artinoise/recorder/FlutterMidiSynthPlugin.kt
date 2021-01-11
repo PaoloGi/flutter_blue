@@ -28,6 +28,7 @@ public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler,/* MidiDri
   private var TAG: String = "FlutterMidiSynthPlugin"
 
   private val recorders = HashMap<String, Int>() //mac,ch
+  private val expressions = HashMap<String, Boolean>() //mac,expression
 
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     attachToEngine(flutterPluginBinding)
@@ -81,8 +82,9 @@ public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler,/* MidiDri
         val ch = call.argument<Int>("channel")
         val bank = call.argument<Int>("bank")
         val mac = call.argument<String>("mac")
-        println("setInstrument ch " + ch + " i " + i + " bank" + bank + " mac" + mac)
-        selectInstrument(ch!!, i!!, bank!!,mac!!)
+        val expression = call.argument<Boolean>("expression")
+        println("setInstrument ch " + ch + " i " + i + " bank " + bank + " mac " + mac + " expression " + expression)
+        selectInstrument(ch!!, i!!, bank!!,mac!!,expression!!)
         result.success(null);
       }
       "noteOn" -> {
@@ -158,11 +160,12 @@ public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler,/* MidiDri
   }
   */
 
-  public fun selectInstrument(ch: Int, i: Int, bank: Int, mac:String?) {
+  public fun selectInstrument(ch: Int, i: Int, bank: Int, mac:String?, expression: Boolean) {
     //Select Sound Bank MSB
     if (!mac.isNullOrEmpty()) {
       recorders[mac] = ch
-      print ("recorders: $recorders")
+      expressions[mac] = expression
+      print ("recorders: $recorders  - expressions: $expression")
     }
     val bankMSB = bank shr 7
     val bankLSB = bank and 0x7f
@@ -246,14 +249,20 @@ public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler,/* MidiDri
 
   public fun sendMidiWithMAC(m: Int, n: Int, v: Int, mac: String?) {
     //println("sendMidiWithMAC $m $n $v $mac recorders= $recorders")
-
+    var vel = v
     var idx = 0
+    var expression = false
     try {
       if(!mac.isNullOrEmpty() && recorders?.size>0) {
         idx = recorders[mac]!!
+        expression = expressions[mac]!!
       }
     } catch (e: KotlinNullPointerException){}
-    sendMidi(m + idx, n, v)
+    if(n == 11 && !expression){
+      println ("expression is filtered for this instrument.")
+      vel=64
+    }
+    sendMidi(m + idx, n, vel)
   }
 
   override fun onDetachedFromActivity() {
