@@ -247,6 +247,8 @@ import Foundation
     }
     
     public func midiEvent(command: UInt32, d1: UInt32, d2: UInt32){
+        //print("SwiftFlutterMidiSyntPlugin.swift midiEvent \(command)  \(d1) \(d2) (RAW) ")
+
         //Average on xpression
         var _d1 = d1
         var _d2 = d2

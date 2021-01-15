@@ -126,7 +126,7 @@ public class MidiBridge
         Log.i("MidiBridge", "selectedPerformance=" + selectedPerformance + " -> audioPeriods=" + audioPeriods);
         ((FluidSynthDriver)engine).setAudioPeriods(audioPeriods,audioPeriodSize);
 
-        Toast.makeText(context, "DeviceSampleRate=" + defaultSampleRate + " DeviceFramesPerBurst=" + defaultFramesPerBurst + " synthAudioPeriods=" + audioPeriods + " synthAudioPeriodSize=" + audioPeriodSize, Toast.LENGTH_LONG).show();
+        //Toast.makeText(context, "DeviceSampleRate=" + defaultSampleRate + " DeviceFramesPerBurst=" + defaultFramesPerBurst + " synthAudioPeriods=" + audioPeriods + " synthAudioPeriodSize=" + audioPeriodSize, Toast.LENGTH_LONG).show();
 
 
         engine.init();
