@@ -575,7 +575,7 @@ typedef NS_ENUM(NSUInteger, LogLevel) {
   }
 
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error {
-  //NSLog(@"SNTX didUpdateValueForCharacteristic %@", [peripheral.identifier UUIDString]);
+  //NSLog(@"SNTX didUpdateValueForCharacteristic %@ value: %@", [peripheral.identifier UUIDString], [characteristic value]);
 
   NSData* data = characteristic.value;
 
