@@ -117,7 +117,7 @@ public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler,/* MidiDri
         for (ch in 0 until 16) {
           sendMidi(0xB0 + ch, 91 /*(CC91: reverb)*/, (amount * 1.27).toInt())
         }
-        //println("FlutterMidiSynthplugin: setReverb not yet implemented under Android.");
+        println("FlutterMidiSynthplugin: setReverb " + amount);
         result.success(null);
       }
       "setDelay" -> {

@@ -622,7 +622,7 @@ typedef NS_ENUM(NSUInteger, LogLevel) {
                 }
             }
         }
-    }
+}
   //NORMAL flutter_blue management (SYSEX)
   //NSLog(@"SNTX uuid: %@ value: %@  len: %d ", [characteristic.UUID fullUUIDString], [characteristic value], (int)[characteristic.value length]);
 
