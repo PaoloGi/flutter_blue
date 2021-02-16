@@ -277,7 +277,7 @@ typedef NS_ENUM(NSUInteger, LogLevel) {
   //transpose
   else if([@"transpose" isEqualToString:call.method]){
       NSNumber * t = [call arguments];
-      _transpose = t.integerValue;
+      _transpose = (int)t.integerValue;
   }
 
   //FlutterMidiSynthPlugin
