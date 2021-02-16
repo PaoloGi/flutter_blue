@@ -13,7 +13,10 @@ import Foundation
     typealias instrumentInfos = (channel : Int, instrument: Int , bank: Int , mac:String?)
     var instruments = [Int:instrumentInfos]() //[channel, instrumentInfos
     var xpressionsMap = [Int:[UInt32]]() //channel, expressions
-    
+    let NOTE_ON = 0x90
+    let NOTE_OFF = 0x80
+    var lastNoteOnOff = 0x80
+
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "FlutterMidiSynthPlugin", binaryMessenger: registrar.messenger())
         let instance = SwiftFlutterMidiSynthPlugin()
@@ -229,7 +232,9 @@ import Foundation
     public func noteOn(channel: Int, note: Int, velocity: Int){
         if (channel < 0 || note < 0 || velocity < 0){ return }
         let sequencer = getSequencer(channel: channel)
-        synth!.playNoteOn(channel: channel, note: UInt8(note), midiVelocity: velocity, sequencer: sequencer)
+        let _velocity = /*lastNoteOnOff == NOTE_OFF ? 0 :*/ velocity
+        lastNoteOnOff = NOTE_ON
+        synth!.playNoteOn(channel: channel, note: UInt8(note), midiVelocity: _velocity, sequencer: sequencer)
         sequencer.noteOn(note: UInt8(note))
         let now = (Int64)(NSDate().timeIntervalSince1970*1000)
         //print("\(now) SwiftFlutterMidiSyntPlugin.swift noteOn \(channel)  \(note) \(velocity) ")
@@ -238,6 +243,7 @@ import Foundation
     public func noteOff(channel: Int, note: Int, velocity: Int){
         if (channel < 0 || note < 0 || velocity < 0){ return }
         xpressionsMap[channel] = []
+        lastNoteOnOff = NOTE_OFF
 
         let sequencer = getSequencer(channel: channel)
         synth!.playNoteOff(channel: channel, note: UInt8(note), midiVelocity: velocity, sequencer: sequencer)

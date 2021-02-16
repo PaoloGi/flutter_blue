@@ -49,7 +49,7 @@ typedef NS_ENUM(NSUInteger, LogLevel) {
 @property(nonatomic) NSMutableArray *characteristicsThatNeedDiscovered;
 @property(nonatomic) LogLevel logLevel;
 @property(nonatomic, retain) SwiftFlutterMidiSynthPlugin *midiSynth;
-
+@property int transpose;
 @end
 
 @implementation FlutterBluePlugin
@@ -76,6 +76,7 @@ typedef NS_ENUM(NSUInteger, LogLevel) {
   //FlutterMidiSynthPlugin
   //[SwiftFlutterMidiSynthPlugin registerWithRegistrar:registrar];
   instance.midiSynth = [[SwiftFlutterMidiSynthPlugin alloc] init];
+  instance.transpose = 0;
 }
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
@@ -271,6 +272,12 @@ typedef NS_ENUM(NSUInteger, LogLevel) {
     }
   } else if([@"requestMtu" isEqualToString:call.method]) {
     result([FlutterError errorWithCode:@"requestMtu" message:@"iOS does not allow mtu requests to the peripheral" details:NULL]);
+  }
+
+  //transpose
+  else if([@"transpose" isEqualToString:call.method]){
+      NSNumber * t = [call arguments];
+      _transpose = t.integerValue;
   }
 
   //FlutterMidiSynthPlugin
@@ -599,10 +606,10 @@ typedef NS_ENUM(NSUInteger, LogLevel) {
                 //NSLog(@"SNTX forwarding MidiMessage to Synth! status=%02x uuid=%@",status ,peripheral.identifier);
                 switch(status){
                 case 0x90:
-                    [_midiSynth noteOnWithMacWithChannel:ch note:d1 velocity:d2 mac:[peripheral.identifier UUIDString]];
+                    [_midiSynth noteOnWithMacWithChannel:ch note:d1+_transpose velocity:d2 mac:[peripheral.identifier UUIDString]];
                     break;
                 case 0x80:
-                    [_midiSynth noteOffWithMacWithChannel:ch note:d1 velocity:d2 mac:[peripheral.identifier UUIDString]];
+                    [_midiSynth noteOffWithMacWithChannel:ch note:d1+_transpose velocity:d2 mac:[peripheral.identifier UUIDString]];
                     break;
                 default:
                 /*

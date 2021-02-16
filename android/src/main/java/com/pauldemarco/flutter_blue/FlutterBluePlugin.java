@@ -91,7 +91,7 @@ public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCa
     private Result pendingResult;
     private ArrayList<String> macDeviceScanned = new ArrayList<>();
     private boolean allowDuplicates = false;
-
+    private int transpose = 0;
     private FlutterMidiSynthPlugin midiSynthPlugin = new FlutterMidiSynthPlugin();
     java.util.HashMap<Integer, CircularFifoArray> xpressionsMap=new HashMap<Integer,CircularFifoArray>(); //ch,List<values>
 
@@ -638,6 +638,11 @@ public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCa
                 break;
             }
 
+            //Transpose:
+            case "transpose":
+                transpose = call.arguments();
+                break;
+
             ///FlutterMidiSynthPlugin
             case "initSynth":
             case "setInstrument":
@@ -1020,14 +1025,14 @@ public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCa
                     ){
                         switch (status){
                             case (byte) 0x90:
-                                midiSynthPlugin.sendNoteOnWithMAC(ch,d1,d2,gatt.getDevice().getAddress());
+                                midiSynthPlugin.sendNoteOnWithMAC(ch,d1+transpose,d2,gatt.getDevice().getAddress());
                                 break;
                             case (byte) 0x80:
                                 CircularFifoArray xpressions = xpressionsMap.get((int) ch);
                                 if(xpressions != null) {
                                     xpressions.clear();
                                 }
-                                midiSynthPlugin.sendNoteOffWithMAC(ch,d1,d2,gatt.getDevice().getAddress());
+                                midiSynthPlugin.sendNoteOffWithMAC(ch,d1+transpose,d2,gatt.getDevice().getAddress());
                                 break;
 
                              case (byte) 0xB0:
