@@ -647,7 +647,7 @@ public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCa
             case "initSynth":
             case "setInstrument":
             case "noteOn":
-            case "noteOnìff":
+            case "noteOff":
             case "midiEvent":
             case "setReverb":
             case "setDelay":
@@ -1025,14 +1025,14 @@ public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCa
                     ){
                         switch (status){
                             case (byte) 0x90:
-                                midiSynthPlugin.sendNoteOnWithMAC(ch,d1+transpose,d2,gatt.getDevice().getAddress());
+                                midiSynthPlugin.sendNoteOnWithMAC(d1+transpose,d2,gatt.getDevice().getAddress());
                                 break;
                             case (byte) 0x80:
                                 CircularFifoArray xpressions = xpressionsMap.get((int) ch);
                                 if(xpressions != null) {
                                     xpressions.clear();
                                 }
-                                midiSynthPlugin.sendNoteOffWithMAC(ch,d1+transpose,d2,gatt.getDevice().getAddress());
+                                midiSynthPlugin.sendNoteOffWithMAC(d1+transpose,d2,gatt.getDevice().getAddress());
                                 break;
 
                              case (byte) 0xB0:

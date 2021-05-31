@@ -27,7 +27,7 @@ public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler,/* MidiDri
   private lateinit var midiBridge: MidiBridge
   private var TAG: String = "FlutterMidiSynthPlugin"
 
-  private val recorders = HashMap<String, Int>() //mac,ch
+  private val recorders = mutableListOf<String>() //mac
   private val expressions = HashMap<String, Boolean>() //mac,expression
 
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
@@ -91,6 +91,7 @@ public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler,/* MidiDri
         val ch = call.argument<Int>("channel")
         val note = call.argument<Int>("note")
         val velocity = call.argument<Int>("velocity")
+        println("noteOn ch " + ch + " note " + note + " velocity " + velocity)
         sendNoteOn(ch!!, note!!, velocity!!)
         result.success(null);
       }
@@ -161,41 +162,63 @@ public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler,/* MidiDri
   */
 
   public fun selectInstrument(ch: Int, i: Int, bank: Int, mac:String?, expression: Boolean) {
+    var ch = 0
     //Select Sound Bank MSB
     if (!mac.isNullOrEmpty()) {
-      recorders[mac] = ch
+      val idx = recorders.indexOfFirst {it == mac}
+      if(idx>=0){
+        ch = idx
+      } else {
+        recorders.add(mac)
+        ch = recorders.size
+      }
       expressions[mac] = expression
       print ("recorders: $recorders  - expressions: $expression")
     }
     val bankMSB = bank shr 7
     val bankLSB = bank and 0x7f
-    println(" -> selectInstrument ch $ch i $i bank $bank (bankMSB $bankMSB bankLSB $bankLSB mac $mac\n")
+    println(" -> selectInstrument ch $ch i $i bank $bank (bankMSB $bankMSB bankLSB $bankLSB mac $mac)\n")
     sendMidi(0xB0 + ch, 0x0,  bankMSB)
     sendMidi(0xB0 + ch, 0x20, bankLSB)
     sendMidiProgramChange(ch, i)
   }
 
-  public fun sendNoteOnWithMAC(ch: Int, n: Int, v: Int, mac: String) {
-    //println ("sendNoteOnWithMAC $ch $n $v $mac recorders= $recorders")
-    var idx = 0
+  public fun sendNoteOnWithMAC(n: Int, v: Int, mac: String) {
+    var ch = 0
     try {
-      if(!mac.isNullOrEmpty() && recorders?.size>0) {
-        idx = recorders[mac]!!
+      if(!mac.isNullOrEmpty()) {
+        val idx = recorders.indexOfFirst {it == mac}
+        if(idx>=0){
+          ch = idx
+        } else {
+          recorders.add(mac)
+          ch = recorders.size
+        }
       }
-    } catch (e: KotlinNullPointerException){}
-    sendNoteOn(ch+idx, n, v)
+    } catch (e: KotlinNullPointerException){
+
+    }
+
+    println ("sendNoteOnWithMAC ${ch} $n $v $mac recorders= $recorders")
+    sendNoteOn(ch, n, v)
   }
 
-  public fun sendNoteOffWithMAC(ch: Int, n: Int, v: Int, mac: String) {
+  public fun sendNoteOffWithMAC(n: Int, v: Int, mac: String) {
     //println ("sendNoteOffWithMAC $ch $n $v $mac recorders= $recorders")
 
-    var idx = 0
+    var ch = 0
     try {
-      if(!mac.isNullOrEmpty() && recorders?.size>0) {
-        idx = recorders[mac]!!
+      if(!mac.isNullOrEmpty()) {
+        val idx = recorders.indexOfFirst {it == mac}
+        if(idx>=0){
+          ch = idx
+        } else {
+          recorders.add(mac)
+          ch = recorders.size
+        }
       }
     } catch (e: KotlinNullPointerException){}
-    sendNoteOff(ch+idx, n, v)
+    sendNoteOff(ch, n, v)
   }
 
   public fun sendNoteOn(ch: Int, n: Int, v: Int) {
@@ -250,11 +273,17 @@ public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler,/* MidiDri
   public fun sendMidiWithMAC(m: Int, n: Int, v: Int, mac: String?) {
     //println("sendMidiWithMAC $m $n $v $mac recorders= $recorders")
     var vel = v
-    var idx = 0
+    var ch = 0
     var expression = false
     try {
-      if(!mac.isNullOrEmpty() && recorders?.size>0) {
-        idx = recorders[mac]!!
+      if(!mac.isNullOrEmpty()) {
+        val idx = recorders.indexOfFirst {it == mac}
+        if(idx>=0){
+          ch = idx
+        } else {
+          recorders.add(mac)
+          ch = recorders.size
+        }
         expression = expressions[mac]!!
       }
     } catch (e: KotlinNullPointerException){}
@@ -262,7 +291,7 @@ public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler,/* MidiDri
       println ("expression is filtered for this instrument.")
       vel=64
     }
-    sendMidi(m + idx, n, vel)
+    sendMidi(m + ch, n, vel)
   }
 
   override fun onDetachedFromActivity() {

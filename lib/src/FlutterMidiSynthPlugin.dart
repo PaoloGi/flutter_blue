@@ -3,6 +3,7 @@ part of flutter_blue;
 class FlutterMidiSynthPlugin {
   //static const MethodChannel _channel = const MethodChannel('FlutterMidiSynthPlugin');
   static const MethodChannel _channel = const MethodChannel('$NAMESPACE/methods');
+  static int curInstrument = -1;
 
   static Future<void> transpose(int t) async {
     return _channel.invokeMethod('transpose',t);
@@ -13,6 +14,7 @@ class FlutterMidiSynthPlugin {
   }
 
   static Future<void> setInstrument(int instrument, int channel, int bank, String mac, bool expression) async {
+    curInstrument = instrument;
     return _channel.invokeMethod('setInstrument',{'channel':channel, 'instrument':instrument, 'bank':bank , 'mac':mac, 'expression':expression});
   }
 
