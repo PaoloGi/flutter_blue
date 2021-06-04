@@ -204,29 +204,29 @@ import Foundation
     public func noteOnWithMac(channel: Int, note: Int, velocity: Int, mac: String ){
         print ("noteOnWithMac \(channel) \(note) \(velocity) \(mac)")
         var vel = velocity
-        let idx = recorders[mac] ?? 0
+        let ch = recorders[mac] ?? channel
         let expression = expressions[mac] ?? false
         //if (!expression){
         //    vel = Int(xpressionsMap[channel]?.last ?? UInt32(velocity))
         //}
-        noteOn(channel: channel+idx, note: note, velocity: vel)
+        noteOn(channel: ch, note: note, velocity: vel)
     }
     
     public func noteOffWithMac(channel: Int, note: Int, velocity: Int, mac: String){
         print ("noteOffWithMac \(channel) \(note) \(velocity) \(mac)")
-        let idx = recorders[mac] ?? 0
-        noteOff(channel: channel+idx, note: note, velocity: velocity)
+        let ch = recorders[mac] ?? channel
+        noteOff(channel: ch, note: note, velocity: velocity)
     }
     
     public func midiEventWithMac(command: UInt32, d1: UInt32, d2: UInt32, mac: String){
         var _d2 = d2
-        let idx = recorders[mac] ?? 0
+        let ch = recorders[mac] ?? 0
         let expression = expressions[mac] ?? false
         if(d1==11 && !expression){
             print ("expression disabled for this instrument.")
             _d2 = 80
         }
-        midiEvent(command: command+UInt32(idx), d1: d1, d2: _d2)
+        midiEvent(command: command+UInt32(ch), d1: d1, d2: _d2)
     }
     
     public func noteOn(channel: Int, note: Int, velocity: Int){

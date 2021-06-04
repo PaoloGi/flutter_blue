@@ -162,25 +162,25 @@ public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler,/* MidiDri
   */
 
   public fun selectInstrument(ch: Int, i: Int, bank: Int, mac:String?, expression: Boolean) {
-    var ch = 0
+    var _ch = ch
     //Select Sound Bank MSB
     if (!mac.isNullOrEmpty()) {
       val idx = recorders.indexOfFirst {it == mac}
       if(idx>=0){
-        ch = idx
+        _ch = idx
       } else {
         recorders.add(mac)
-        ch = recorders.size
+        _ch = recorders.size - 1
       }
       expressions[mac] = expression
       print ("recorders: $recorders  - expressions: $expression")
     }
     val bankMSB = bank shr 7
     val bankLSB = bank and 0x7f
-    println(" -> selectInstrument ch $ch i $i bank $bank (bankMSB $bankMSB bankLSB $bankLSB mac $mac)\n")
-    sendMidi(0xB0 + ch, 0x0,  bankMSB)
-    sendMidi(0xB0 + ch, 0x20, bankLSB)
-    sendMidiProgramChange(ch, i)
+    println(" -> selectInstrument ch $_ch i $i bank $bank (bankMSB $bankMSB bankLSB $bankLSB mac $mac)\n")
+    sendMidi(0xB0 + _ch, 0x0,  bankMSB)
+    sendMidi(0xB0 + _ch, 0x20, bankLSB)
+    sendMidiProgramChange(_ch, i)
   }
 
   public fun sendNoteOnWithMAC(n: Int, v: Int, mac: String) {
