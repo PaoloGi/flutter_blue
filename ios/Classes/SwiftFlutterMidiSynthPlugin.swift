@@ -196,9 +196,9 @@ import Foundation
         synth!.loadPatch(patchNo: instrument, channel: channel, bank: bank)
         getSequencer(channel: channel).patch = UInt32(instrument)
         
-        //if(mac != nil){
-        //    midiEventWithMac(command: UInt32(channel), d1: 11, d2: 10, mac: mac!) //invio un expression fittizio
-        //}
+        if(mac != nil){
+            midiEventWithMac(command: 0xB0 + UInt32(channel), d1: 11, d2: 10, mac: mac!) //invio un expression fittizio
+        }
     }
     
     public func noteOnWithMac(channel: Int, note: Int, velocity: Int, mac: String ){
@@ -258,7 +258,8 @@ import Foundation
         //Average on xpression
         var _d1 = d1
         var _d2 = d2
-        if(d1 == 11){
+        if(command & 0xf0 == 0xb0 && d1 == 11){
+            //print("SwiftFlutterMidiSyntPlugin.swift midiEvent \(command)  \(d1) \(d2) (RAW) ")
             //_d2 = xpressionAvg(ch: Int(command & 0xf), value: _d2)
             _d2 = xpressionScale(min:25, max:110, value: _d2)
             //_d1 = 7
