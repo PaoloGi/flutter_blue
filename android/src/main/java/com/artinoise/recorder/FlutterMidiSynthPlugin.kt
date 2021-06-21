@@ -28,6 +28,7 @@ public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler,/* MidiDri
   private var TAG: String = "FlutterMidiSynthPlugin"
 
   private val recorders = mutableListOf<String>() //mac
+  private val isDrum = mutableListOf<Boolean>()
   private val expressions = HashMap<String, Boolean>() //mac,expression
 
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
@@ -164,13 +165,18 @@ public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler,/* MidiDri
   public fun selectInstrument(ch: Int, i: Int, bank: Int, mac:String?, expression: Boolean) {
     var _ch = ch
     //Select Sound Bank MSB
-    if (!mac.isNullOrEmpty()) {
+    if (!mac.isNullOrEmpty()) { //exclude DRUMS channel
       val idx = recorders.indexOfFirst {it == mac}
       if(idx>=0){
-        _ch = idx
+        if(isDrum.size <= idx)
+          isDrum.add(ch == 9)
+        else
+          isDrum[idx] = (ch == 9)
+        _ch = if (isDrum[idx]) 9 else idx
       } else {
         recorders.add(mac)
-        _ch = recorders.size - 1
+        isDrum.add(ch == 9)
+        _ch = if (isDrum[idx]) 9 else recorders.size - 1
       }
       expressions[mac] = expression
       print ("recorders: $recorders  - expressions: $expression")
@@ -189,7 +195,7 @@ public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler,/* MidiDri
       if(!mac.isNullOrEmpty()) {
         val idx = recorders.indexOfFirst {it == mac}
         if(idx>=0){
-          ch = idx
+          ch = if (isDrum[idx]) 9 else idx
         } else {
           recorders.add(mac)
           ch = recorders.size
@@ -211,7 +217,7 @@ public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler,/* MidiDri
       if(!mac.isNullOrEmpty()) {
         val idx = recorders.indexOfFirst {it == mac}
         if(idx>=0){
-          ch = idx
+          ch = if (isDrum[idx]) 9 else idx
         } else {
           recorders.add(mac)
           ch = recorders.size
