@@ -176,7 +176,7 @@ public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler,/* MidiDri
       } else {
         recorders.add(mac)
         isDrum.add(ch == 9)
-        _ch = if (isDrum[idx]) 9 else recorders.size - 1
+        _ch = if (isDrum[0]) 9 else recorders.size - 1
       }
       expressions[mac] = expression
       print ("recorders: $recorders  - expressions: $expression")
