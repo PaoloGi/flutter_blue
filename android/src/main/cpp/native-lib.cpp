@@ -361,7 +361,7 @@ extern "C" JNIEXPORT jint JNICALL Java_com_artinoise_recorder_FluidSynthDriver_M
 extern "C" JNIEXPORT jint JNICALL Java_com_artinoise_recorder_FluidSynthDriver_MIDISetVolume(JNIEnv* env, jobject, jdouble v) {
     if(playerSynth){
         int drumCh = 9;
-        __android_log_print(ANDROID_LOG_INFO, TAG, "MIDISetVolume player = %p. ch=%d v=%f",player,ch,v);
+        __android_log_print(ANDROID_LOG_INFO, TAG, "MIDISetVolume player = %p. v=%f",player,v);
         for (int ch = 1; ch<16; ch++){
           if (ch != drumCh){
             int res = fluid_synth_cc(playerSynth, ch, 0x7, (int)v);
