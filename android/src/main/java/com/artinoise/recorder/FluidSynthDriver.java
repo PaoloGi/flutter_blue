@@ -36,4 +36,24 @@ public class FluidSynthDriver extends DriverBase
     public native void setDefaultStreamValues(int defaultSampleRate, int defaultFramesPerBurst);
     public native void setAudioPeriods(int audioPeriods, int audioPeriodSize);
 
+    ///////////////////////
+    //FLUID MEDIAPLAYER API
+    ///////////////////////
+    public native int MIDIPrepare(String filename, int ticksPerBeat);
+    public native int MIDIPlay();
+    public native int MIDIPause();
+    public native int MIDIResume();
+    public native int MIDIStop();
+    public native int MIDIGetTotalTicks();
+    public native double MIDIGetCurrentTick();
+    public native int MIDIGetBpm();
+    public native int MIDIGetTempo();
+    public native int MIDIGetStatus();
+
+    public native int MIDISetVolume(double v);
+    public native int MIDISetTempo(double t);
+    public native int MIDISetMetronomeVolume(double v);
+
+
+
 }

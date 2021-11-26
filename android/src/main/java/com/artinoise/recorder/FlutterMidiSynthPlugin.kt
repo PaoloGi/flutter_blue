@@ -130,6 +130,62 @@ public class FlutterMidiSynthPlugin: FlutterPlugin, MethodCallHandler,/* MidiDri
         println("FlutterMidiSynthplugin: initAudioSession not needed under Android.");
         result.success(null);
       }
+
+      ///////////////////////
+      //FLUID MEDIAPLAYER API
+      ///////////////////////
+      "MIDIPrepare" -> {
+        println("FlutterMidiSynthplugin: MIDIPrepare");
+        val name = call.argument<String>("name")
+        val ticksPerBeat = call.argument<Int>("ticksPerBeat")
+        val path: String = context.getApplicationContext().getDir("flutter", Context.MODE_PRIVATE).getPath()
+        val r = midiBridge.MIDIPrepare(path + "/" + name, ticksPerBeat!!);
+        result.success(r.toString());
+      }
+      "MIDIPlay" -> {
+        println("FlutterMidiSynthplugin: MIDIPlay");
+        val r = midiBridge.MIDIPlay();
+        result.success(r.toString());
+      }
+      "MIDIStop" -> {
+        println("FlutterMidiSynthplugin: MIDIStop");
+        val r = midiBridge.MIDIStop();
+        result.success(r.toString());
+      }
+      "MIDIPause" -> {
+        println("FlutterMidiSynthplugin: MIDIPause");
+        val r = midiBridge.MIDIPause();
+        result.success(r.toString());
+      }
+      "MIDIResume" -> {
+        println("FlutterMidiSynthplugin: MIDIResume");
+        val r = midiBridge.MIDIResume();
+        result.success(r.toString());
+      }
+      "MIDIGetCurrentTick" -> {
+        //println("FlutterMidiSynthplugin: MIDIGetCurrentTick");
+        val r = midiBridge.MIDIGetCurrentTick();
+        result.success(r.toString());
+      }
+      "MIDISetVolume" -> {
+        println("FlutterMidiSynthplugin: MIDISetVolume");
+        val vol = call.argument<Double>("volume")
+        val r = midiBridge.MIDISetVolume(vol!!);
+        result.success(r.toString());
+      }
+      "MIDISetTempo" -> {
+        println("FlutterMidiSynthplugin: MIDISetTempo");
+        val rate = call.argument<Double>("rate")
+        val r = midiBridge.MIDISetTempo(rate!!);
+        result.success(r.toString());
+      }
+      "MIDISetMetronomeVolume" -> {
+        println("FlutterMidiSynthplugin: MIDISetMetronomeVolume");
+        val v = call.argument<Double>("volume")
+        val r = midiBridge.MIDISetMetronomeVolume(v!!);
+        result.success(r.toString());
+      }
+
       else -> {
         println("unknown method " + call.method);
         result.notImplemented();

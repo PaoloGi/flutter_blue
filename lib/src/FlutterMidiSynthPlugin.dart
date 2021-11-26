@@ -41,4 +41,43 @@ class FlutterMidiSynthPlugin {
   static Future<void> initAudioSession(int param) async {
     return _channel.invokeMethod('initAudioSession', param);
   }
+
+  ///////////////////////
+  //FLUID MEDIAPLAYER API
+  ///////////////////////
+  static Future<String> load(String name,[int ticksPerBeat = 960]) async {
+    return _channel.invokeMethod('MIDIPrepare', {'name':name , 'ticksPerBeat':ticksPerBeat});
+  }
+
+  static Future<void> start() async {
+    return _channel.invokeMethod('MIDIPlay');
+  }
+
+  static Future<void> stop() async {
+    return _channel.invokeMethod('MIDIStop');
+  }
+
+  static Future<void> pause(bool b) async {
+    return b ? _channel.invokeMethod('MIDIPause') :  _channel.invokeMethod('MIDIResume');
+  }
+
+  static Future<String> position() async {
+    final String res = await _channel.invokeMethod('MIDIGetCurrentTick');
+    return res;
+  }
+
+  static Future<String> setVolume(double v) async {
+    final String res = await _channel.invokeMethod('MIDISetVolume',{"volume":v});
+    return res;
+  }
+
+  static Future<String> setTempo(double rate) async {
+    final String res = await _channel.invokeMethod('MIDISetTempo',{"rate":rate});
+    return res;
+  }
+  static Future<String> setMetronomeVolume(double vol) async {
+    final String res = await _channel.invokeMethod('MIDISetMetronomeVolume',{"volume":vol});
+    return res;
+  }
+
 }
