@@ -1083,7 +1083,7 @@ public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCa
 
         private byte xpressionScale(int min, int max, byte v) {
             double scaled = min + (max-min)*v/127.0f;
-            Log.i("xpressionScale", " v=" + v + " scaled=" + scaled );
+            Log.d("xpressionScale", " v=" + v + " scaled=" + scaled );
             return (byte)(int)scaled;
         }
 
