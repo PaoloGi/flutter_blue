@@ -45,8 +45,8 @@ class FlutterMidiSynthPlugin {
   ///////////////////////
   //FLUID MEDIAPLAYER API
   ///////////////////////
-  static Future<String> load(String name,[int ticksPerBeat = 960]) async {
-    return _channel.invokeMethod('MIDIPrepare', {'name':name , 'ticksPerBeat':ticksPerBeat});
+  static Future<String?> load(String name,[int ticksPerBeat = 960]) async {
+    return _channel.invokeMethod('MIDIPrepare', {'name':name , 'ticksPerBeat':ticksPerBeat}) as String?;
   }
 
   static Future<void> start() async {

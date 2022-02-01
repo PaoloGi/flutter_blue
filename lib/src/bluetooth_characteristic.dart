@@ -8,13 +8,13 @@ class BluetoothCharacteristic {
   final Guid uuid;
   final DeviceIdentifier deviceId;
   final Guid serviceUuid;
-  final Guid secondaryServiceUuid;
+  final Guid? secondaryServiceUuid;
   final CharacteristicProperties properties;
   final List<BluetoothDescriptor> descriptors;
   bool get isNotifying {
     try {
       var cccd =
-          descriptors.singleWhere((d) => d.uuid == BluetoothDescriptor.cccd);
+      descriptors.singleWhere((d) => d.uuid == BluetoothDescriptor.cccd);
       return ((cccd.lastValue[0] & 0x01) > 0 || (cccd.lastValue[0] & 0x02) > 0);
     } catch (e) {
       return false;
@@ -23,11 +23,11 @@ class BluetoothCharacteristic {
 
   BehaviorSubject<List<int>> _value;
   Stream<List<int>> get value => Rx.merge([
-        _value.stream,
-        _onValueChangedStream,
-      ]);
+    _value.stream,
+    _onValueChangedStream,
+  ]);
 
-  List<int> get lastValue => _value.value;
+  List<int> get lastValue => _value.value ?? [];
 
   BluetoothCharacteristic.fromProto(protos.BluetoothCharacteristic p)
       : uuid = new Guid(p.uuid),
@@ -86,11 +86,11 @@ class BluetoothCharacteristic {
         .where((m) => m.method == "ReadCharacteristicResponse")
         .map((m) => m.arguments)
         .map((buffer) =>
-            new protos.ReadCharacteristicResponse.fromBuffer(buffer))
+    new protos.ReadCharacteristicResponse.fromBuffer(buffer))
         .where((p) =>
-            (p.remoteId == request.remoteId) &&
-            (p.characteristic.uuid == request.characteristicUuid) &&
-            (p.characteristic.serviceUuid == request.serviceUuid))
+    (p.remoteId == request.remoteId) &&
+        (p.characteristic.uuid == request.characteristicUuid) &&
+        (p.characteristic.serviceUuid == request.serviceUuid))
         .map((p) => p.characteristic.value)
         .first
         .then((d) {
@@ -114,7 +114,7 @@ class BluetoothCharacteristic {
       ..characteristicUuid = uuid.toString()
       ..serviceUuid = serviceUuid.toString()
       ..writeType =
-          protos.WriteCharacteristicRequest_WriteType.valueOf(type.index)
+      protos.WriteCharacteristicRequest_WriteType.valueOf(type.index)!
       ..value = value;
 
     var result = await FlutterBlue.instance._channel
@@ -128,16 +128,16 @@ class BluetoothCharacteristic {
         .where((m) => m.method == "WriteCharacteristicResponse")
         .map((m) => m.arguments)
         .map((buffer) =>
-            new protos.WriteCharacteristicResponse.fromBuffer(buffer))
+    new protos.WriteCharacteristicResponse.fromBuffer(buffer))
         .where((p) =>
-            (p.request.remoteId == request.remoteId) &&
-            (p.request.characteristicUuid == request.characteristicUuid) &&
-            (p.request.serviceUuid == request.serviceUuid))
+    (p.request.remoteId == request.remoteId) &&
+        (p.request.characteristicUuid == request.characteristicUuid) &&
+        (p.request.serviceUuid == request.serviceUuid))
         .first
         .then((w) => w.success)
         .then((success) => (!success)
-            ? throw new Exception('Failed to write the characteristic')
-            : null)
+        ? throw new Exception('Failed to write the characteristic')
+        : null)
         .then((_) => null);
   }
 
@@ -157,9 +157,9 @@ class BluetoothCharacteristic {
         .map((m) => m.arguments)
         .map((buffer) => new protos.SetNotificationResponse.fromBuffer(buffer))
         .where((p) =>
-            (p.remoteId == request.remoteId) &&
-            (p.characteristic.uuid == request.characteristicUuid) &&
-            (p.characteristic.serviceUuid == request.serviceUuid))
+    (p.remoteId == request.remoteId) &&
+        (p.characteristic.uuid == request.characteristicUuid) &&
+        (p.characteristic.serviceUuid == request.serviceUuid))
         .first
         .then((p) => new BluetoothCharacteristic.fromProto(p.characteristic))
         .then((c) {
@@ -170,7 +170,7 @@ class BluetoothCharacteristic {
 
   @override
   String toString() {
-    return 'BluetoothCharacteristic{uuid: $uuid, deviceId: $deviceId, serviceUuid: $serviceUuid, secondaryServiceUuid: $secondaryServiceUuid, properties: $properties, descriptors: $descriptors, value: ${_value?.value}';
+    return 'BluetoothCharacteristic{uuid: $uuid, deviceId: $deviceId, serviceUuid: $serviceUuid, secondaryServiceUuid: $secondaryServiceUuid, properties: $properties, descriptors: $descriptors, value: ${_value.value}';
   }
 }
 
@@ -191,15 +191,15 @@ class CharacteristicProperties {
 
   CharacteristicProperties(
       {this.broadcast = false,
-      this.read = false,
-      this.writeWithoutResponse = false,
-      this.write = false,
-      this.notify = false,
-      this.indicate = false,
-      this.authenticatedSignedWrites = false,
-      this.extendedProperties = false,
-      this.notifyEncryptionRequired = false,
-      this.indicateEncryptionRequired = false});
+        this.read = false,
+        this.writeWithoutResponse = false,
+        this.write = false,
+        this.notify = false,
+        this.indicate = false,
+        this.authenticatedSignedWrites = false,
+        this.extendedProperties = false,
+        this.notifyEncryptionRequired = false,
+        this.indicateEncryptionRequired = false});
 
   CharacteristicProperties.fromProto(protos.CharacteristicProperties p)
       : broadcast = p.broadcast,
